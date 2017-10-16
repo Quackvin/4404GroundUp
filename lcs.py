@@ -9,8 +9,7 @@ class LCS:
 		self.correctSet = []
 		self.maxPopSize = maxPopSize
 
-
-	def doMatching(self, instance):
+	def doMatching(self, instance, doTest):
 		classifierIndex = 0
 		for classifer in self.population:
 			if(self.doesMatch(classifier.rules, instance.features)):
@@ -18,13 +17,11 @@ class LCS:
 			classifierIndex += 1
 
 		pass
+	# if doTest, ignore training function
 	# 	initialise empty match set
 	# 	compare each rule to instance
 	# 	add matches to match set
 	# 	do covering if not enough matches
-
-	def doMatchset(self):
-		pass
 
 	def doesMatch(self, classifierRules, instanceFeatures):
 		pass
