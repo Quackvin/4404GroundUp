@@ -27,8 +27,8 @@ class LCS:
 		pass
 
 	def doCovering(self):
-
-		self.population.append(classifier.Classifier(self.currIter, classifcation))
+		classification = 'null'
+		self.population.append(classifier.Classifier(self.currIter, classification))
 		pass
 
 	def doCorrectSet(self):

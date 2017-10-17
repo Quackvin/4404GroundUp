@@ -1,9 +1,18 @@
 class Environment:
-	def __init__(self):
-		self.instances = []
+	def __init__(self, datafile):
+		self.instances = self.parseDatafile(datafile)
 
-	def parseDatafile(self):
-		pass
+	def parseDatafile(self, datafile):
+		with open(datafile, 'r') as data:
+			allInstances = []
+			for line in data:
+				dataline = line.split('\t')
+				outcome = dataline[-1]
+				features = []
+				for feat in dataline[0:-1]:
+					features.append(feat)
+				allInstances.append(Instance(features,outcome))
+			return allInstances
 
 class Instance:
 	def __init__(self, features, outcome):
