@@ -21,7 +21,7 @@ def run(lcs, env, doTest):
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 			lcs.updateParameters(matchSetSize)
-			'''lcs.GA()'''
+			'''lcs.GA()''' # TODO: call GA only if criteria met for average interval between GA applications
 			lcs.consolidateClassifiers()
 			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()

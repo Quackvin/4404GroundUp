@@ -11,6 +11,9 @@ class LCS:
 		self.maxPopSize = 100
 		self.coveringWildcardProbability = 0.3
 
+		# Parameters for GA
+		self.probabilityCrossover = 0.75
+
 		self.currIter = 0
 
 
@@ -113,35 +116,64 @@ class LCS:
 #########################################################################
 
 	def GA(self):
+		# TODO: description
+		# creates 2 new classifiers
+		# applies subsuption to correct set after adding children into it
+		# put matchset and correctset back into population
+
+		# Update last GA iteration for all classifiers in correct set
 		self.updateLastGAIterations()
-		parents = self.selectParents()
-		self.initialiseChildParameters()
-		children = self.doCrossover(parents)
+
+		# Select parents
+		parent1 = self.selectParents()
+		parent2 = self.selectParents()
+
+		# Initialise children
+		child1 = parent1
+		child2 = parent2
+		child1.numerosity = 1
+		child2.numerosity = 1
+		child1.birthIteration = self.currIter
+		child2.birthIteration = self.currIter
+		
+		# Apply crossover
+		if random.random() < self.probabilityCrossover:
+			(child1, child2) = self.doCrossover(child1, child2)
+
+		# TODO
 		self.doMutation()
 		self.correctSet.append(children[0])
 		self.correctSet.append(children[1])
-		self.doSubsumption()
+		#self.doSubsumption()
 		pass
-	# creates 2 new classifiers
-	# applies subsuption to correct set after adding children into it
-	# put matchset and correctset back into population
+	
 
 	def updateLastGAIterations(self):
-		pass
-		# loops through correct set and sets lastGAIter in all elements of correct set to currIter
+		# Called by GA
+		# Loops through correct set and sets lastGAIteration of all elements to currIter
+		for classifier in self.correctSet:
+			classifier.lastGAIteration = self.currIter
 
-	def selectParents(self):
-		pass
-	# goes through correct set and uses roulette wheel selection to choose two parents and returns them
+	def selectParent(self):
+		# Select a parents classifier for GA from correct set using Roulette-Wheel Selection
+		# With Roulette-Wheel Selection, the probability of selecting a given classifier in the
+		# correct set is proportional to its fitness.
+		fitnessSum = 0
+		for classifier in self.correctSet:
+			fitnessSum += classifier.fitness
 
-	def initialiseChildParameters(self):
-		pass
-	# rules in the paper (fitness and accuray from parents)
+		choicePoint = random.random()*fitnessSum	# select position on wheel
+		fitnessSum = 0
+		for classifier in self.correctSet:
+			fitnessSum += classifier.fitness
+			if fitnessSum > choicePoint: 	# return classifier at selected position on wheel
+				return classifier
 
-	def doCrossover(self, parents):
+	def doCrossover(self, childA, childB):
+		# Applies crossover to two children classifiers and returns the modifier children
+		# Uses two point crossover
+		# TODO: include option for single point crossover (third argument or based on an internal parameter)
 		pass
-	# returns children
-	# rules in paper
 
 	def doMutation(self):
 		pass
