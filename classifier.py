@@ -1,5 +1,5 @@
 class Classifier:
-	def __init__(self, currIter, classification):
+	def __init__(self, currIter, outcome, rules):
 		self.matchCount = 0
 		self.correctCount = 0
 		self.accuracy = 0
@@ -7,12 +7,18 @@ class Classifier:
 		self.numerosity = 1
 		self.lastGAIteration = 0
 		self.birthIteration = currIter
-		self.averageMatchsetSize = 0
+		self.aveMatchSetSize = 0
 
-		self.rules = []
-		self.classification = classification
+		self.rules = rules
+		self.outcome = outcome
 
-class Rule:
+class Rules:
 	def __init__(self):
 		self.centres = []
 		self.ranges = []
+
+	def getLowerBound(self, i):
+		return self.centres[i] - self.ranges[i]
+
+	def getUpperBound(self, i):
+		return self.centres[i] + self.ranges[i]

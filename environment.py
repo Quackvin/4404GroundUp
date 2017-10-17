@@ -10,7 +10,7 @@ class Environment:
 				outcome = dataline[-1]
 				features = []
 				for feat in dataline[0:-1]:
-					features.append(feat)
+					features.append(float(feat))
 				allInstances.append(Instance(features,outcome))
 			return allInstances
 

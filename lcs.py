@@ -1,52 +1,114 @@
-import classifier
+import classifier, random
 
 class LCS:
-	def __init__(self, maxPopSize):
+	# '#' indicates wildcard
+	def __init__(self):
 		# put all LCS parameters here
-		self.population = []
-		self.currIter = 0
+		self.population = []	# list of Classifier objects
 		self.matchSet = []
 		self.correctSet = []
-		self.maxPopSize = maxPopSize
 
-	def doMatching(self, instance, doTest):
-		classifierIndex = 0
-		for classifer in self.population:
-			if(self.doesMatch(classifier.rules, instance.features)):
-				self.correctSet.append(self.population.pop(classifierIndex))
-			classifierIndex += 1
+		self.maxPopSize = 100
+		self.coveringWildcardProbability = 0.3
 
-		pass
-	# if doTest, ignore training function
-	# 	initialise empty match set
-	# 	compare each rule to instance
-	# 	add matches to match set
-	# 	do covering if not enough matches
+		self.currIter = 0
+
+
+	def doMatching(self, instance):
+		self.matchSet = []
+		unmatchedPopulation = []
+
+		matchCount = 0
+		# move matching classifiers from population to matchSet
+		for classifier in self.population:
+			if self.doesMatch(classifier.rules, instance.features):
+				self.matchSet.append(classifier)
+				matchCount += 1
+			else:
+				unmatchedPopulation.append(classifier)
+
+		self.population = unmatchedPopulation
+		return matchCount
+
 
 	def doesMatch(self, classifierRules, instanceFeatures):
-		pass
+		for i in range(len(classifierRules)):
+			# false if not wildcard and outside range from centre
+			if instanceFeatures[i] != '#' and \
+					(	instanceFeatures[i] < classifierRules.getLowerBound(i) or
+						instanceFeatures[i] > classifierRules.getUpperBound(i)	):
+				return False
+		return True
 
-	def doCovering(self):
-		classification = 'null'
-		self.population.append(classifier.Classifier(self.currIter, classification))
-		pass
 
-	def doCorrectSet(self):
+	def doCorrectSet(self, instance):
+		self.correctSet = []
+		incorrectSet = []
+
+		# move correct matches from matchSet to correctSet
+		for classifier in self.matchSet:
+			if classifier.outcome == instance.outcome:
+				self.correctSet.append(classifier)
+			else:
+				incorrectSet.append(classifier)
+
+		self.matchSet = incorrectSet
+
+
+	def doCovering(self, instance):
+		outcome = instance.outcome
+		rules = classifier.Rules()
+		for feat in instance.features:
+			# add centres
+			if random.randrange(0,100)/100 < self.coveringWildcardProbability:
+				rules.centres.append('#')
+			else:
+				rules.centres.append(feat)
+			# add ranges
+			if random.randrange(0,100)/100 < self.coveringWildcardProbability:
+				rules.ranges.append('#')
+			else:
+				rules.ranges.append(feat/10)
+		''' 	add a range too. Need to decide on range for range values. Currently 10% of centre		'''
+
+		self.correctSet.append(classifier.Classifier(self.currIter, outcome, rules))
+
+
+	def updateParameters(self, matchSetSize):
+		for classifier in self.correctSet:
+			classifier.matchCount += 1
+			classifier.correctCount += 1
+			classifier.accuracy = classifier.correctCount / classifier.matchCount
+			classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
+			classifier.matchCount)
+			"""	fitness """
+		for classifier in self.matchSet:
+			classifier.matchCount += 1
+			classifier.accuracy = classifier.correctCount / classifier.matchCount
+			classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
+			classifier.matchCount)
+			"""	fitness """
+
+
+	def consolidateClassifiers(self):
+		for classifier in self.correctSet:
+			self.population.append(classifier)
+		self.correctSet = []
+
+		for classifier in self.matchSet:
+			self.population.append(classifier)
+		self.matchSet = []
+
+
+	def doDeletion(self):
 		pass
-	# pop them out of match set
-	# generate correct and incorrect sets
-	# used for training
+	# general deletion for if population is too big
+
 
 	def classifyInstance(self):
 		pass
 	# 	used for testing
 
-	def updateParameters(self):
-		pass
-
-	def doDeletion(self):
-		pass
-	# general deletion for if population is too big
 
 #########################################################################
 
