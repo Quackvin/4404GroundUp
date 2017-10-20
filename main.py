@@ -21,7 +21,8 @@ def run(lcs, env, doTest):
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 			lcs.updateParameters(matchSetSize)
-			'''lcs.GA(instance.features)''' # TASK: call GA always, work out probabilities in GA function
+			lcs.GA(instance.features)			 # includes GA subsumption
+			lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
 			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()

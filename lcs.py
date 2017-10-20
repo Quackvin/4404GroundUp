@@ -2,6 +2,7 @@ import classifier, random
 
 class LCS:
 	# '#' indicates wildcard
+	# correct count is used as the analog for experience (in classifier parameters)
 	def __init__(self):
 		# Sets
 		self.population = []
@@ -13,12 +14,26 @@ class LCS:
 		self.maxPopSize = 100
 		self.coveringWildcardProbability = 0.3
 		self.initialRangeFactor = 0.1			# when initialising a rule, set range = initialRangeFactor*centre
+		
 
 		# Parameters for GA
+		self.GAThreshold = 25					# average iterations between GA applications
 		self.probabilityCrossover = 0.75
 		self.probabilityAlleleMutation = 0.02
 		self.probabilityWildcardMutation = 0.2
 		self.mutationScale = 0.1
+
+		# Subsumption paramerers
+		self.GASubsumption = True
+		self.correctSetSubsumption = True
+		self.subsumeExpThreshold = 20
+		self.subsumeAccuracyThreshold = 0.9
+		# XCS required prediction error (related to accuracy) to be below a certain threshold. In this
+		# implementation (supervised learning) we do not have prediction accuracy. Hence, correct set
+		# accuracy is used instead. Standard values for this parameter could only be found for reinforcement
+		# learning cases. The starting value of 0.9 was chosen based on the standard values in the
+		# literature being 10% of the maximum reward in the reinforcement learning. Hence, 90% accuracy
+		# was chosen as the threshold.
 
 
 	def doMatching(self, instance):
@@ -91,6 +106,7 @@ class LCS:
 			else:
 				rules.ranges.append(feat/10)
 		''' 	add a range too. Need to decide on range for range values. Currently 10% of centre		'''
+				# AARON: I have defined self.initialRangeFactor = 0.1 and used this for a similar task in setRuleToRandom (within doMutation)
 
 		self.correctSet.append(classifier.Classifier(self.currIter, outcome, rules))
 
@@ -110,7 +126,7 @@ class LCS:
 			classifier.matchCount)
 			"""	fitness """
 
-
+	# Move classifiers from the correct set back to the population
 	def consolidateClassifiers(self):
 		for classifier in self.correctSet:
 			self.population.append(classifier)
@@ -134,12 +150,21 @@ class LCS:
 #########################################################################
 
 	# TASK: description
+	# TASK: GA called in every iteration, work out probabilities in GA function (i.e. whether to run)
+	#
 	# creates 2 new classifiers
 	# applies subsuption to correct set after adding children into it
 	# put matchset and correctset back into population
 
 	# instanceFeatures is required for mutation back from a wildcard
+	#
+	# GA
+	# Called by main
+	#
 	def GA(self, instanceFeatures):
+
+		# TASK: check average time since last GA iteration, if too high, run GA. Else, just run doSubsumption
+
 		# Update last GA iteration for all classifiers in correct set
 		self.updateLastGAIterations()
 
@@ -163,13 +188,27 @@ class LCS:
 		self.doMutation(child1, instanceFeatures)
 		self.doMutation(child2, instanceFeatures)
 
-		# Add children to correct set
-		self.correctSet.append(child1)
-		self.correctSet.append(child2)
+		# Apply GA subsumption and add non-subsumed children to correct set
+		if self.GASubsumption:
+			# First child
+			if self.doesSubsume(parent1, child1):
+				parent1.numerosity += 1
+			elif self.doesSubsume(parent2, child1):
+				parent2.numerosity += 1
+			else:
+				self.correctSet.append(child1)
+			
+			# Second child
+			if self.doesSubsume(parent1, child2):
+				parent1.numerosity += 1
+			elif self.doesSubsume(parent2, child2):
+				parent2.numerosity += 1
+			else:
+				self.correctSet.append(child2)
 
-
-		#self.doSubsumption()
-		pass
+		# Apply correct set subsumption
+		if self.correctSetSubsumption:
+			self.doCorrectSetSubsumption()
 	
 
 	# updateLastGAIterations
@@ -178,6 +217,7 @@ class LCS:
 	def updateLastGAIterations(self):
 		for classifier in self.correctSet:
 			classifier.lastGAIteration = self.currIter
+
 
 	# selectParents
 	# Called by GA
@@ -205,8 +245,9 @@ class LCS:
 	# range value. The crossover point will never split a (centre, range) pair.
 	#
 	# TASK: add option for single point crossover (e.g. extra argument or internal parameter)
+	# TASK: add averaging of parameters. Use a weighted average based on the amount crossed over (an improvement compared to Butz & Wilson)
 	def doCrossover(self, childA, childB):
-		n_conditions = len(childA.rules.centres)	# number of components in a classifier rule
+		n_conditions = len(childA.rules)	# number of components in a classifier rule
 		x = random.random()*2*n_conditions			# continuous implementation has two alleles per component
 		y = random.random()*2*n_conditions
 		if x > y:
@@ -238,20 +279,19 @@ class LCS:
 	#    close to 1. range is calculated as initialRangeFactor times the centre value.
 	def doMutation(self, child, instanceFeatures):
 		# Mutation of rule centre values
-		for i in range(0,len(child.rules.centres)):
+		for i in range(0,len(child.rules)):
 			# Mutate allele stochastically
 			if random.random() < self.probabilityAlleleMutation:
 				# Wildcard to non-wildcard
 				if child.rules.centres[i] == '#':
 					self.setRuleToRandom(child,instanceFeatures,i)
-				
 				# Non-wildcard to wildcard
-				if random.random() < self.probabilityWildcardMutation:
+				elif random.random() < self.probabilityWildcardMutation:
 					child.rules.centres[i] = '#'
 					child.rules.ranges[i] = '#'
-
 				# Non-wildcard to non-wildcard
-				child.rules.centres[i] += self.mutationScale * random.uniform(-1,1)
+				else:
+					child.rules.centres[i] += self.mutationScale * random.uniform(-1,1)
 
 		# Mutation of rule range values
 		for i in range(0,len(child.rules.ranges)):
@@ -260,14 +300,13 @@ class LCS:
 				# Wildcard to non-wildcard
 				if child.rules.ranges[i] == '#':
 					self.setRuleToRandom(child,instanceFeatures,i)
-				
 				# Non-wildcard to wildcard
-				if random.random() < self.probabilityWildcardMutation:
+				elif random.random() < self.probabilityWildcardMutation:
 					child.rules.centres[i] = '#'
 					child.rules.ranges[i] = '#'
-
 				# Non-wildcard to non-wildcard
-				child.rules.ranges[i] += self.mutationScale * random.uniform(-1,1)
+				else:
+					child.rules.ranges[i] += self.mutationScale * random.uniform(-1,1)
 
 
 	# setRuleToRandom
@@ -281,7 +320,57 @@ class LCS:
 		child.rules.ranges[index] = child.rules.centres[index] * self.initialRangeFactor
 
 
-	def doSubsumption(self):
+	# doesSubsume
+	# Called by GA (in GA subsumption) and doCorrectSetSubsumption
+	# Checks whether a given classifier (the subsumer) subsumes another (the subsumee). The
+	# requirements for this are that: (1) they share the same action, (2) the sumsumer is 
+	# sufficiently experiences and accurate, and (3) the subsumer is more general.
+	def doesSubsume(self, subsumer, subsumee):
+		if subsumer.outcome == subsumee.outcome:
+			if self.couldSubsume(subsumer):
+				if isMoreGeneral(subsumer, subsumee):
+					return True
+
+		return False
+
+
+	# couldSubsume
+	# Called by doesSubsume
+	# Checks if the potential subsumer is sufficiently experienced (large enough correctCount)
+	# and accurate to be considered for subsumption.
+	def couldSubsume(self, classifier):
+		if classifier.correctCount > self.subsumeExpThreshold:
+			if classifier.accuracy > self.subsumeAccuracyThreshold:
+				return True
+
+		return False
+
+	# isMoreGeneral
+	# Called by doesSubsume
+	# Checks that the proposed subsumer is more general than the proposed subsumee at each predicate
+	# (aka rule element or condition). To be more general at a given predicate, the subsumer must either
+	# have a wildcard at that point or be such that its upper bound exceeds that of the subsumee while
+	# its lower bound is also lower than that of the subsumee. That is, it must at least the same range
+	# of values as the subsumee.
+	def isMoreGeneral(self, subsumer, subsumee):
+		for i in range(0,len(subsumer.rules)):
+			if sumsumer.rules.centre[i] != '#':
+				if (sumsumer.getLowerBound(i) > sumsumee.getLowerBound(i) or
+					sumsumer.getUpperBound(i) < sumsumee.getUpperBound(i)):
+					return False
+		
+		return True
+
+	#TASK: code this function
+	#
+	# doCorrectSetSubsumption
+	# Called by main
+	def doCorrectSetSubsumption(self):
 		pass
+		
+
 	# applies to correct set
+	# need more checks for whether a classifier is more general
+	# consider having some tolerance, i.e. the subsumee doesn't have to be fully encompassed by the subsumer - partial overlap allowed
+	# if we don't do this, I suspect subsumption will be very rare
 	
