@@ -1,48 +1,14 @@
-from unittest import TestCase
+import classifier as classifierModule
+import lcs as lcsModule
+
+def test_doesMatch(lcs):
+	testInst = 			[1	,2	,3	,4,	5]
+	testRules = classifierModule.Rules()
+	testRules.centres = ['#',3,	3.4,4,	6]
+	testRules.ranges =  ['#',1,	0.5	,0,	1]
+	print(lcs.doesMatch(testRules,testInst))
 
 
-class TestLCS(TestCase):
-	def test_doMatching(self):
-		self.fail()
+lcs = lcsModule.LCS()
 
-	def test_doesMatch(self):
-		self.fail()
-
-	def test_doCorrectSet(self):
-		self.fail()
-
-	def test_doCovering(self):
-		self.fail()
-
-	def test_updateParameters(self):
-		self.fail()
-
-	def test_consolidateClassifiers(self):
-		self.fail()
-
-	def test_doDeletion(self):
-		self.fail()
-
-	def test_classifyInstance(self):
-		self.fail()
-
-	def test_GA(self):
-		self.fail()
-
-	def test_updateLastGAIterations(self):
-		self.fail()
-
-	def test_selectParents(self):
-		self.fail()
-
-	def test_initialiseChildParameters(self):
-		self.fail()
-
-	def test_doCrossover(self):
-		self.fail()
-
-	def test_doMutation(self):
-		self.fail()
-
-	def test_doSubsumption(self):
-		self.fail()
+test_doesMatch(lcs)
