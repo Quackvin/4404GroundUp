@@ -35,14 +35,23 @@ class TestLCS(TestCase):
 	def test_selectParents(self):
 		self.fail()
 
-	def test_initialiseChildParameters(self):
-		self.fail()
-
 	def test_doCrossover(self):
 		self.fail()
 
 	def test_doMutation(self):
 		self.fail()
 
-	def test_doSubsumption(self):
+	def test_setRuleToRandom(self):
+		self.fail()
+	
+	def test_doesSubsume(self):
+		self.fail()
+	
+	def test_couldSubsume(self):
+		self.fail()
+		
+	def test_isMoreGeneral(self):
+		self.fail()
+		
+	def test_doCorrectSetSubsumption(self):
 		self.fail()
