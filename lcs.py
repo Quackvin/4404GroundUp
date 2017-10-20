@@ -41,16 +41,9 @@ class LCS:
 	def doesMatch(self, classifierRules, instanceFeatures):
 		for i in range(len(classifierRules)):
 			# false if not wildcard and outside range from centre
-
-			################################################################################
-			# AARON: I think this is a bug: instanceFeatures refers to the instance from the
-			# environment, which will never be a whilecard. The check needs to be that the
-			# classifier rule is not a wildcard
-			################################################################################
-
-			if instanceFeatures[i] != '#' and \
-					(	instanceFeatures[i] < classifierRules.getLowerBound(i) or
-						instanceFeatures[i] > classifierRules.getUpperBound(i)	):
+			if(classifierRules.centers[i] != "#" and
+						instanceFeatures[i] < classifierRules.getLowerBound(i) or
+						instanceFeatures[i] > classifierRules.getUpperBound(i)):
 				return False
 		return True
 
@@ -73,24 +66,12 @@ class LCS:
 		outcome = instance.outcome
 		rules = classifier.Rules()
 		for feat in instance.features:
-			
-			###########################################################################################
-			# AARON: I think there may be an issue. Does it make sense for the centre to hae a wildcard
-			# but not the range, or vice versa? I.e. you can't do matching if only one is a wildcard.
-			# So I think you should either set both to wildcards, or both to definite values.
-			###########################################################################################
-
-			# add centres
 			if random.randrange(0,100)/100 < self.coveringWildcardProbability:
 				rules.centres.append('#')
-			else:
-				rules.centres.append(feat)
-			# add ranges
-			if random.randrange(0,100)/100 < self.coveringWildcardProbability:
 				rules.ranges.append('#')
 			else:
-				rules.ranges.append(feat/10)
-		''' 	add a range too. Need to decide on range for range values. Currently 10% of centre		'''
+				rules.centres.append(feat)
+				rules.ranges.append(feat / 10)
 
 		self.correctSet.append(classifier.Classifier(self.currIter, outcome, rules))
 
@@ -144,8 +125,11 @@ class LCS:
 		self.updateLastGAIterations()
 
 		# Select parents
-		parent1 = self.selectParents()
-		parent2 = self.selectParents()
+		###########################################
+		# Kevin: Removed 's' from function call to match function declaration
+		###########################################
+		parent1 = self.selectParent()
+		parent2 = self.selectParent()
 
 		# Initialise children
 		child1 = parent1
