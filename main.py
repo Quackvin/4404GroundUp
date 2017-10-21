@@ -21,10 +21,11 @@ def run(lcs, env, doTest):
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 			lcs.updateParameters(matchSetSize)
-			# lcs.GA(instance.features)			 # includes GA subsumption
+			if len(lcs.correctSet) > 3: 				# needs more conditions
+				lcs.GA(instance.features)			 	# includes GA subsumption
 			# lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
-			if len(lcs.population) > lcs.maxPopSize:
+			while len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
 
 		'''---NOT IMPLEMENTED YET---'''

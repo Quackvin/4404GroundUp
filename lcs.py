@@ -14,11 +14,13 @@ class LCS:
 		self.currIter = 0
 		self.maxPopSize = 100
 		self.coveringWildcardProbability = 0.3
-		self.initialRangeFactor = 0.5		   # when initialising a rule, set range = abs(initialRangeFactor*centre)
-		
+		self.initialRangeFactor = 0.5		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
+		self.powerParameter = 5					# value based on paper's stated typical value
+		self.deletionThreshold = 20
+		self.deletionFitnessScale = 0.1
 
 		# Parameters for GA
-		self.GAThreshold = 25				   # average iterations between GA applications
+		self.GAThreshold = 25				   	# average iterations between GA applications
 		self.probabilityCrossover = 0.75
 		self.probabilityAlleleMutation = 0.02
 		self.probabilityWildcardMutation = 0.2
@@ -99,13 +101,16 @@ class LCS:
 			classifier.accuracy = classifier.correctCount / classifier.matchCount
 			classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
 			classifier.matchCount)
-			"""	fitness """
+			classifier.fitness = pow(classifier.accuracy,self.powerParameter)
+
 		for classifier in self.matchSet:
 			classifier.matchCount += 1
 			classifier.accuracy = classifier.correctCount / classifier.matchCount
 			classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
 			classifier.matchCount)
-			"""	fitness """
+			classifier.fitness = pow(classifier.accuracy, self.powerParameter)
+
+			#fitness from "A Scalable Evolutionary Learning Classifier System for Knowledge Discovery in Stream Data Mining"
 
 	# Move classifiers from the correct set back to the population
 	def consolidateClassifiers(self):
@@ -119,9 +124,32 @@ class LCS:
 
 
 	def doDeletion(self):
-		pass
-	# general deletion for if population is too big
+		voteSum = 0
+		for classifier in self.population:
+			voteSum = voteSum + self.deletionVote(classifier)
+		choicePoint = random.uniform(0,1) * voteSum
 
+		voteSum = 0
+		for i in range(len(self.population)):
+			voteSum = voteSum + self.deletionVote(self.population[i])
+			if voteSum > choicePoint:
+				if self.population[i].numerosity > 1:
+					self.population[i].numerosity -= 1
+				else:
+					self.population.pop(i)
+				break
+
+	def deletionVote(self, classifier):
+		vote = classifier.aveMatchSetSize * classifier.numerosity
+
+		popFitnessSum = sum([x.fitness for x in self.population])
+		popAveFitness = popFitnessSum/len(self.population)
+
+		if classifier.matchCount > self.deletionThreshold \
+			and classifier.fitness/classifier.numerosity < self.deletionFitnessScale * popAveFitness:
+			vote = vote * popAveFitness / (classifier.fitness/classifier.numerosity)
+
+		return vote
 
 	def classifyInstance(self):
 		pass
@@ -217,10 +245,10 @@ class LCS:
 		fitnessSum = 0
 		for classifier in self.correctSet:
 			fitnessSum += classifier.fitness
-			if fitnessSum > choicePoint:  # return classifier at selected position on wheel
+			if fitnessSum >= choicePoint:  # return classifier at selected position on wheel
 				return classifier
 			#####################################
-			# KEVIN:  needs a fall back so it will definitely return something. Currently getting null
+			# KEVIN:  changed > to >= to account for edge cases
 			#####################################
 
 
