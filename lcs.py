@@ -92,7 +92,8 @@ class LCS:
 			else:
 				rules.centres.append(feat)
 				rules.ranges.append(abs(feat) * self.initialRangeFactor)
-		self.correctSet.append(classifierModule.Classifier(self.currIter, outcome, rules))
+		classifier = (classifierModule.Classifier(self.currIter, outcome, rules))
+		self.correctSet.append(classifier)
 
 
 	def updateParameters(self, matchSetSize):
@@ -426,8 +427,12 @@ class LCS:
 		# Search for most general classifier in the correct set
 		for classifier in self.correctSet:
 			if self.couldSubsume(classifier):
-				if (len(mostGeneralClassifier.rules) == 0 or
-						classifier.wildcardCount > mostGeneralClassifier.wildcardCount or
+				####################################
+				if len(mostGeneralClassifier.rules.centres) == 0:
+					mostGeneralClassifier = classifier
+				# KEVIN: Made this into separate conditional so dummy classifier isn't added to correct set
+				####################################
+				elif (classifier.wildcardCount > mostGeneralClassifier.wildcardCount or
 						(classifier.wildcardCount == mostGeneralClassifier.wildcardCount and
 						classifier.sumRange > mostGeneralClassifier.sumRange)):
 					# Move old most general classifier to tmp set and update it
@@ -442,13 +447,11 @@ class LCS:
 			####################################
 			for classifier in tmpCorrectSet:
 			# KEVIN: tmpCorrectSet wasn't being used as a class element so the "self" reference was removed
-			####################################
 				if self.isMoreGeneral(mostGeneralClassifier, classifier):
 					mostGeneralClassifier.numerosity += classifier.numerosity
-					tmpCorrectSet.remove(classifier)
-		
-		# Return mostGeneralClassifier to correct set
-		tmpCorrectSet.append(mostGeneralClassifier)
-
-		# Update correct set
-		self.correctSet = tmpCorrectSet
+				else:
+					self.correctSet.append(classifier)
+			# KEVIN: Modified to append straight to correctSet if not subsumed
+			####################################
+			# Return mostGeneralClassifier to correct set if it isnt the dummy one
+			self.correctSet.append(mostGeneralClassifier)

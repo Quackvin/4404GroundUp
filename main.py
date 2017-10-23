@@ -1,9 +1,14 @@
 import lcs as lcsModule
+import classifier as classifierModule
 import environment
+import json
 
-def main():
+def main(loadPop):
 	env = environment.Environment('data.txt')
 	lcs = lcsModule.LCS()
+	if loadPop:
+		loadPopulation(lcs)
+	print(len(lcs.population))
 	run(lcs, env, False)
 
 def run(lcs, env, doTest):
@@ -32,13 +37,38 @@ def run(lcs, env, doTest):
 
 		'''---NOT IMPLEMENTED YET---'''
 		endcondition = False
+		'''-------------------------'''
 		if endcondition:
 			savePopulation(lcs.population)
 			return 0
-		'''-------------------------'''
+
 
 def savePopulation(population):
-	pass
-# write to file
+	with open('classifierPopulation.json', 'w') as writeFile:
+		for classifier in population:
+			classifierDict = classifier.__dict__
+			classifierDict['rules'] = classifierDict['rules'].__dict__
+			classifierString = json.dumps(classifierDict) + '\n'
+			writeFile.write(classifierString)
 
-main()
+def loadPopulation(lcs):
+	with open('classifierPopulation.json', 'r') as readFile:
+		for classifierStr in readFile:
+			classifierDict = json.loads(classifierStr)
+
+			rules = classifierModule.Rules()
+			rules.centres = classifierDict['rules']['centres']
+			rules.ranges = classifierDict['rules']['ranges']
+
+			classifier = classifierModule.Classifier(classifierDict['birthIteration'], classifierDict['outcome'], rules)
+			classifier.matchCount = classifierDict['matchCount']
+			classifier.correctCount = classifierDict['correctCount']
+			classifier.accuracy = classifierDict['accuracy']
+			classifier.fitness = classifierDict['fitness']
+			classifier.numerosity = classifierDict['numerosity']
+			classifier.lastGAIteration = classifierDict['lastGAIteration']
+			classifier.aveMatchSetSize = classifierDict['aveMatchSetSize']
+
+			lcs.population.append(classifier)
+
+main(True)
