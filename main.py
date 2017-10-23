@@ -41,7 +41,7 @@ def run(lcs, env, doTest):
 		if endcondition:
 			savePopulation(lcs.population)
 			return 0
-
+	savePopulation(lcs.population)
 
 def savePopulation(population):
 	with open('classifierPopulation.json', 'w') as writeFile:
