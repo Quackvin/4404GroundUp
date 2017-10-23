@@ -44,17 +44,16 @@ class LCS:
 		self.matchSet = []
 		unmatchedPopulation = []
 
-		matchCount = 0
+		# matchCount = 0
 		# move matching classifiers from population to matchSet
 		for classifier in self.population:
 			if self.doesMatch(classifier.rules, instance.features):
 				self.matchSet.append(classifier)
-				matchCount += 1
+				# matchCount += 1
 			else:
 				unmatchedPopulation.append(classifier)
 
 		self.population = unmatchedPopulation
-		return matchCount
 
 
 	def doesMatch(self, classifierRules, instanceFeatures):
@@ -96,7 +95,8 @@ class LCS:
 		self.correctSet.append(classifier)
 
 
-	def updateParameters(self, matchSetSize):
+	def updateParameters(self):
+		matchSetSize = len(self.correctSet) + len(self.matchSet)
 		for classifier in self.correctSet:
 			classifier.matchCount += 1
 			classifier.correctCount += 1

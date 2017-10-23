@@ -14,8 +14,6 @@ def run(lcs, env, doTest):
 	for instance in env.instances:
 		lcs.currIter += 1
 
-		matchSetSize = lcs.doMatching(instance)
-
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
 			lcs.formPrediction()
@@ -24,7 +22,7 @@ def run(lcs, env, doTest):
 			lcs.doCorrectSet(instance)
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
-			lcs.updateParameters(matchSetSize)
+			lcs.updateParameters()
 			if len(lcs.correctSet) > 3: 				# needs more conditions
 				lcs.GA(instance.features)			 	# includes GA subsumption
 			lcs.doCorrectSetSubsumption()
@@ -70,4 +68,4 @@ def loadPopulation(lcs):
 
 			lcs.population.append(classifier)
 
-main(True)
+main(False)
