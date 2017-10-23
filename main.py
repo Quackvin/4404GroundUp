@@ -11,7 +11,6 @@ def run(lcs, env, doTest):
 		lcs.currIter += 1
 
 		matchSetSize = lcs.doMatching(instance)
-		print('match set size: ', matchSetSize)
 
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
@@ -19,17 +18,17 @@ def run(lcs, env, doTest):
 			'''-------------------'''
 		else:
 			lcs.doCorrectSet(instance)
-			print('correct set size: ', len(lcs.correctSet))
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 			lcs.updateParameters(matchSetSize)
 			if len(lcs.correctSet) > 3: 				# needs more conditions
-				print('doing GA')
 				lcs.GA(instance.features)			 	# includes GA subsumption
 			# lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
 			while len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
+
+			# print(lcs.getAveAcc())
 
 		'''---NOT IMPLEMENTED YET---'''
 		endcondition = False

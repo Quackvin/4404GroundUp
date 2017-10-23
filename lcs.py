@@ -156,6 +156,11 @@ class LCS:
 
 		return vote
 
+	# only for testing and monitoring
+	def getAveAcc(self):
+		return sum([classifier.accuracy for classifier in self.population]) / len(self.population)
+
+
 	def classifyInstance(self):
 		pass
 	#	 used for testing
