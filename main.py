@@ -8,7 +8,6 @@ def main(loadPop):
 	lcs = lcsModule.LCS()
 	if loadPop:
 		loadPopulation(lcs)
-	print(len(lcs.population))
 	run(lcs, env, False)
 
 def run(lcs, env, doTest):
