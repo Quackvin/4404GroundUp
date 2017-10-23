@@ -12,9 +12,9 @@ class LCS:
 
 		# General parameters
 		self.currIter = 0
-		self.maxPopSize = 100
-		self.coveringWildcardProbability = 0.9
-		self.initialRangeFactor = 0.5		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
+		self.maxPopSize = 1000
+		self.coveringWildcardProbability = 0.3
+		self.initialRangeFactor = 0.1		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
 		self.powerParameter = 5					# value based on paper's stated typical value
 		self.deletionThreshold = 20
 		self.deletionFitnessScale = 0.1
@@ -91,7 +91,7 @@ class LCS:
 				rules.ranges.append('#')
 			else:
 				rules.centres.append(feat)
-				rules.ranges.append(abs(feat * self.initialRangeFactor))
+				rules.ranges.append(abs(feat) * self.initialRangeFactor)
 		self.correctSet.append(classifierModule.Classifier(self.currIter, outcome, rules))
 
 
@@ -126,25 +126,25 @@ class LCS:
 
 	def doDeletion(self):
 		voteSum = 0
+		popFitnessSum = sum([x.fitness for x in self.population])
+		popAveFitness = popFitnessSum / len(self.population)
+
 		for classifier in self.population:
-			voteSum = voteSum + self.deletionVote(classifier)
+			voteSum = voteSum + self.deletionVote(classifier, popAveFitness)
 		choicePoint = random.uniform(0,1) * voteSum
 
 		voteSum = 0
 		for i in range(len(self.population)):
-			voteSum = voteSum + self.deletionVote(self.population[i])
-			if voteSum > choicePoint:
+			voteSum = voteSum + self.deletionVote(self.population[i], popAveFitness)
+			if voteSum >= choicePoint:
 				if self.population[i].numerosity > 1:
 					self.population[i].numerosity -= 1
 				else:
 					self.population.pop(i)
 				break
 
-	def deletionVote(self, classifier):
+	def deletionVote(self, classifier, popAveFitness):
 		vote = classifier.aveMatchSetSize * classifier.numerosity
-
-		popFitnessSum = sum([x.fitness for x in self.population])
-		popAveFitness = popFitnessSum/len(self.population)
 
 		if classifier.matchCount > self.deletionThreshold \
 			and classifier.fitness/classifier.numerosity < self.deletionFitnessScale * popAveFitness:
@@ -157,7 +157,7 @@ class LCS:
 		return vote
 
 	# only for testing and monitoring
-	def getAveAcc(self):
+	def getAveClassifierAcc(self):
 		return sum([classifier.accuracy for classifier in self.population]) / len(self.population)
 
 

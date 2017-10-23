@@ -23,12 +23,12 @@ def run(lcs, env, doTest):
 			lcs.updateParameters(matchSetSize)
 			if len(lcs.correctSet) > 3: 				# needs more conditions
 				lcs.GA(instance.features)			 	# includes GA subsumption
-			# lcs.doCorrectSetSubsumption()
+			lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
-			while len(lcs.population) > lcs.maxPopSize:
+			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
 
-			# print(lcs.getAveAcc())
+			# print(lcs.getAveClassifierAcc())
 
 		'''---NOT IMPLEMENTED YET---'''
 		endcondition = False
