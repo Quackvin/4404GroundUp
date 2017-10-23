@@ -13,11 +13,12 @@ class LCS:
 		# General parameters
 		self.currIter = 0
 		self.maxPopSize = 100
-		self.coveringWildcardProbability = 0.3
+		self.coveringWildcardProbability = 0.9
 		self.initialRangeFactor = 0.5		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
 		self.powerParameter = 5					# value based on paper's stated typical value
 		self.deletionThreshold = 20
 		self.deletionFitnessScale = 0.1
+		self.featurePrecision = 0.00000000001
 
 		# Parameters for GA
 		self.GAThreshold = 25				   	# average iterations between GA applications
@@ -147,7 +148,11 @@ class LCS:
 
 		if classifier.matchCount > self.deletionThreshold \
 			and classifier.fitness/classifier.numerosity < self.deletionFitnessScale * popAveFitness:
-			vote = vote * popAveFitness / (classifier.fitness/classifier.numerosity)
+			if classifier.fitness == 0:
+				# to fix divide by 0 error
+				vote = vote * popAveFitness / self.featurePrecision
+			else:
+				vote = vote * popAveFitness / (classifier.fitness/classifier.numerosity)
 
 		return vote
 
@@ -263,17 +268,21 @@ class LCS:
 	# TASK: averaging of child parameters, weighted average based on the amount crossed over This
 	# would be an improvement compared to Butz & Wilson
 	def doCrossover(self, childA, childB):
-		n_conditions = len(childA.rules)	# number of components in a classifier rule
-		x = random.random()*2*n_conditions			# continuous implementation has two alleles per component
-		y = random.random()*2*n_conditions
+		n_conditions = len(childA.rules.centres)	# number of components in a classifier rule
+		################################
+		x = random.random()*n_conditions			# continuous implementation has two alleles per component
+		y = random.random()*n_conditions
+		# KEVIN: Removed the 2x scalar. It was causing out of bounds errors
+		################################
 		if x > y:
+			# x is the smaller value
 			x, y = y, x
 		
 		i = 0
 		while i < y:
 			if x <= i and y > i:
 				childA.rules.centres[i], childB.rules.centres[i] = childB.rules.centres[i], childA.rules.centres[i]
-				childA.rules.rangse[i], childB.rules.ranges[i] = childB.rules.ranges[i], childA.rules.ranges[i]
+				childA.rules.ranges[i], childB.rules.ranges[i] = childB.rules.ranges[i], childA.rules.ranges[i]
 			i += 1
 		
 		return (childA, childB)
@@ -295,7 +304,7 @@ class LCS:
 	#	 close to 1. range is calculated as initialRangeFactor times the centre value.
 	def doMutation(self, child, instanceFeatures):
 		# Mutation of rule centre values
-		for i in range(0,len(child.rules)):
+		for i in range(0,len(child.rules.centres)):
 			# Mutate allele stochastically
 			if random.random() < self.probabilityAlleleMutation:
 				# Wildcard to non-wildcard
@@ -364,14 +373,13 @@ class LCS:
 		if classifier.correctCount > self.subsumeExpThreshold:
 			if classifier.accuracy > self.subsumeAccuracyThreshold:
 				return True
-
 		return False
 
 
 	# isMoreGeneral
 	# Called by doesSubsume and doCorrectSetSubsumption
 	# Checks that the proposed subsumer is more general than the proposed subsumee at each predicate
-	# (aka rule element or condition). To be more general at a given predicate, the subsumer must
+			# (aka rule element or condition). To be more general at a given predicate, the subsumer must
 	# either have a wildcard at that point or be such that its upper bound exceeds that of the
 	# subsumee while its lower bound is also lower than that of the subsumee. That is, it must at
 	# least the same range of values as the subsumee.
@@ -383,15 +391,17 @@ class LCS:
 	# tolerance for 'not quite more general'.
 	def isMoreGeneral(self, subsumer, subsumee):
 		for i in range(0, len(subsumer.rules)):
-			if subsumer.rules.centre[i] != '#':
-				####################################
-				if (subsumer.getLowerBound(i) > subsumee.getLowerBound(i) or
-							subsumer.getUpperBound(i) < subsumee.getUpperBound(i)):
-					print('???')
-				# KEVIN: changed potential typo from "sumsumer" and "sumsumee" to "subsumer" and "subsumee"
-				##################################
+			# if subsumee has a wildcard that subsumer doesnt, then subsumer is not more general
+			if subsumee.rules.centre[i] == '#':
+				if subsumer.rules.centre[i] == '#':
+					return  True
+				else:
 					return False
-
+			# no wildcards should get to here
+			# if either bound of the subsumee is  closer to the subsumer's centre and the subsumee has a larger range
+			elif (subsumer.getLowerBound(i) > subsumee.getLowerBound(i) or subsumer.getUpperBound(i) < subsumee.getUpperBound(i)) \
+							and subsumer.ranges[i] < subsumee.ranges[i]:
+				return False
 		return True
 
 
@@ -423,7 +433,7 @@ class LCS:
 					tmpCorrectSet.append(classifier)
 
 		# Perform subsumption if a suitable mostGeneralClassifier was found
-		if len(mostGeneralClassifier.rules) != 0:
+		if len(mostGeneralClassifier.rules.centres) != 0:
 			####################################
 			for classifier in tmpCorrectSet:
 			# KEVIN: tmpCorrectSet wasn't being used as a class element so the "self" reference was removed
