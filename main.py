@@ -14,6 +14,7 @@ def run(lcs, env, doTest):
 	for instance in env.instances:
 		lcs.currIter += 1
 
+		lcs.doMatching()
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
 			lcs.formPrediction()
