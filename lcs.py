@@ -384,18 +384,15 @@ class LCS:
 	# more general given the number of predicated/rule elements. Hence, we should allow some
 	# tolerance for 'not quite more general'.
 	def isMoreGeneral(self, subsumer, subsumee):
-		for i in range(0, len(subsumer.rules)):
-			# if subsumee has a wildcard that subsumer doesnt, then subsumer is not more general
-			if subsumee.rules.centre[i] == '#':
-				if subsumer.rules.centre[i] == '#':
-					return  True
-				else:
-					return False
-			# no wildcards should get to here
-			# if either bound of the subsumee is  closer to the subsumer's centre and the subsumee has a larger range
-			elif (subsumer.getLowerBound(i) > subsumee.getLowerBound(i) or subsumer.getUpperBound(i) < subsumee.getUpperBound(i)) \
-							and subsumer.ranges[i] < subsumee.ranges[i]:
+		for i in range(0, len(subsumer.rules.centres)):
+			# If the subsumee has a wildcard that the subsumer does not, return False
+			if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
 				return False
+			# If neither has a wildcard, check upper and lower bounds
+			elif subsumer.rules.getLowerBound(i) > subsumee.rules.getLowerBound(i) or \
+				subsumer.rules.getUpperBound(i) < subsumee.rules.getUpperBound(i):
+				return False
+
 		return True
 
 
@@ -410,6 +407,7 @@ class LCS:
 		# Initialise most general classifier variable
 		initRules = classifierModule.Rules()
 		mostGeneralClassifier = classifierModule.Classifier(self.currIter, 0, initRules)
+		tmpCorrectSet = []
 
 		# Search for most general classifier in the correct set
 		for classifier in self.correctSet:
@@ -419,28 +417,29 @@ class LCS:
 					mostGeneralClassifier = classifier
 				# If current classifier is more general, overwrite mostGeneralClassifier
 				# and move the old one to the tmpCorrectSet
+				# In this case, "more general" is interpreted as having more wildcards or an equal number of wildcards
+				# but a larger total range.
 				elif (classifier.wildcardCount() > mostGeneralClassifier.wildcardCount() or
 						(classifier.wildcardCount() == mostGeneralClassifier.wildcardCount() and
 						classifier.sumRange() > mostGeneralClassifier.sumRange())):
 					tmpCorrectSet.append(mostGeneralClassifier)	# return old version to tmp set
 					mostGeneralClassifier = classifier			# update new version
+				# If current classifier in not most general, add it to tmp set
+				else:
+					tmpCorrectSet.append(classifier)
 			# If current classifier in not most general, add it to tmp set
-			# Note that this is done outside the if (couldSubsume) condition so that all
-			# classifiers end up in the tmpCorrectSet (for looping over in the next setp) or are
-			# the mostGeneralClassifier
+			# Note that this is done outside the if (couldSubsume) condition as well as inside it
+			# since classifiers need to be appended to tmpCorrectSet in either case
 			else:
 				tmpCorrectSet.append(classifier)
-				# TEST: does this include everything from the correctSet minue the most general?
 
 		# Perform subsumption if a suitable mostGeneralClassifier was found
 		if len(mostGeneralClassifier.rules.centres) != 0:
-			####################################
+			self.correctSet = []	# reset correct set
 			for classifier in tmpCorrectSet:
 				if self.isMoreGeneral(mostGeneralClassifier, classifier):
 					mostGeneralClassifier.numerosity += classifier.numerosity
 				else:
 					self.correctSet.append(classifier)
-			# KEVIN: Modified to append straight to correctSet if not subsumed
-			####################################
 			# Return mostGeneralClassifier to correct set if it isn't the dummy one
 			self.correctSet.append(mostGeneralClassifier)

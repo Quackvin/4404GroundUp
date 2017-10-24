@@ -15,7 +15,7 @@ class Classifier:
     # Counts the number of wildcard elements (precepts) in the classifier rules
     def wildcardCount(self):
         count = 0
-        for i in range(0,len(self.rules)):
+        for i in range(0, len(self.rules.centres)):
             if self.rules.centres[i] == '#':
                 count += 1
         
@@ -24,7 +24,7 @@ class Classifier:
     # Calculated the sum of all ranges in the classifier rules that are not wildcards
     def sumRange(self):
         sum = 0
-        for i in range(0,len(self.rules)):
+        for i in range(0, len(self.rules)):
             if self.rules.centres[i] != '#':
                 sum += self.rules.ranges[i]
 
@@ -36,8 +36,20 @@ class Rules:
         self.centres = []
         self.ranges = []
 
+        # Values to be used for upper and lower bounds in case of wildcard
+        self.minLowerBound = -9999
+        self.maxUpperBound = +9999
+
+
     def getLowerBound(self, i):
+        if self.centres[i] == '#':
+            return self.minLowerBound
+
         return self.centres[i] - self.ranges[i]
 
+
     def getUpperBound(self, i):
+        if self.centres[i] == '#':
+            return self.maxUpperBound
+
         return self.centres[i] + self.ranges[i]
