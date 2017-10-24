@@ -11,6 +11,8 @@ def main(loadPop):
 	run(lcs, env, False)
 
 def run(lcs, env, doTest):
+	# TASK: put this in a while loop so that you complete multiple loops over the 
+	# set of instances
 	for instance in env.instances:
 		lcs.currIter += 1
 

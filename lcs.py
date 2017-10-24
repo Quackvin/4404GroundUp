@@ -18,7 +18,7 @@ class LCS:
 		self.powerParameter = 5					# value based on paper's stated typical value
 		self.deletionThreshold = 20
 		self.deletionFitnessScale = 0.1
-		self.featurePrecision = 0.00000000001
+		self.featurePrecision = 0.00000000001	# 
 
 		# Parameters for GA
 		self.GAThreshold = 25				   	# average iterations between GA applications
@@ -188,9 +188,6 @@ class LCS:
 		self.updateLastGAIterations()
 
 		# Select parents
-		###########################################
-		# Kevin: Removed 's' from function call to match function declaration
-		###########################################
 		parent1 = self.selectParent()
 		parent2 = self.selectParent()
 
@@ -258,9 +255,6 @@ class LCS:
 			fitnessSum += classifier.fitness
 			if fitnessSum >= choicePoint:  # return classifier at selected position on wheel
 				return classifier
-			#####################################
-			# KEVIN:  changed > to >= to account for edge cases
-			#####################################
 
 
 	# doCrossover
@@ -275,11 +269,8 @@ class LCS:
 	# would be an improvement compared to Butz & Wilson
 	def doCrossover(self, childA, childB):
 		n_conditions = len(childA.rules.centres)	# number of components in a classifier rule
-		################################
 		x = random.random()*n_conditions			# continuous implementation has two alleles per component
 		y = random.random()*n_conditions
-		# KEVIN: Removed the 2x scalar. It was causing out of bounds errors
-		################################
 		if x > y:
 			# x is the smaller value
 			x, y = y, x
@@ -341,7 +332,7 @@ class LCS:
 				# Non-wildcard to non-wildcard
 				else:
 					child.rules.ranges[i] += self.mutationScale * random.uniform(-1,1)
-
+					# TASK: check range does not go negative
 
 	# setRuleToRandom
 	# Called by doMutation
@@ -357,15 +348,12 @@ class LCS:
 	# doesSubsume
 	# Called by GA (in GA subsumption)
 	# Checks whether a given classifier (the subsumer) subsumes another (the subsumee). The
-	# requirements for this are that: (1) they share the same action, (2) the sumsumer is 
+	# requirements for this are that: (1) they share the same action, (2) the subsumer is 
 	# sufficiently experiences and accurate, and (3) the subsumer is more general.
 	def doesSubsume(self, subsumer, subsumee):
 		if subsumer.outcome == subsumee.outcome:
 			if self.couldSubsume(subsumer):
-				##########################################
 				if self.isMoreGeneral(subsumer, subsumee):
-				# KEVIN: added self. to call self.isMoreGeneral
-				##########################################
 					return True
 
 		return False
@@ -419,39 +407,40 @@ class LCS:
 	# numerosity added to that of the most general classifier. Subsumed classifiers are deleted
 	# from the correct set.
 	def doCorrectSetSubsumption(self):
-		# Initialise most general classifier vraiable
+		# Initialise most general classifier variable
 		initRules = classifierModule.Rules()
 		mostGeneralClassifier = classifierModule.Classifier(self.currIter, 0, initRules)
-		tmpCorrectSet = []
 
 		# Search for most general classifier in the correct set
 		for classifier in self.correctSet:
 			if self.couldSubsume(classifier):
-				####################################
+				# If mostGeneralClassifier is not assigned, assign it a classifier that can subsume
 				if len(mostGeneralClassifier.rules.centres) == 0:
 					mostGeneralClassifier = classifier
-				# KEVIN: Made this into separate conditional so dummy classifier isn't added to correct set
-				####################################
-				elif (classifier.wildcardCount > mostGeneralClassifier.wildcardCount or
-						(classifier.wildcardCount == mostGeneralClassifier.wildcardCount and
-						classifier.sumRange > mostGeneralClassifier.sumRange)):
-					# Move old most general classifier to tmp set and update it
-					tmpCorrectSet.append(mostGeneralClassifier)
-					mostGeneralClassifier = classifier
-				else:
-					# If not most general, add to tmp set
-					tmpCorrectSet.append(classifier)
+				# If current classifier is more general, overwrite mostGeneralClassifier
+				# and move the old one to the tmpCorrectSet
+				elif (classifier.wildcardCount() > mostGeneralClassifier.wildcardCount() or
+						(classifier.wildcardCount() == mostGeneralClassifier.wildcardCount() and
+						classifier.sumRange() > mostGeneralClassifier.sumRange())):
+					tmpCorrectSet.append(mostGeneralClassifier)	# return old version to tmp set
+					mostGeneralClassifier = classifier			# update new version
+			# If current classifier in not most general, add it to tmp set
+			# Note that this is done outside the if (couldSubsume) condition so that all
+			# classifiers end up in the tmpCorrectSet (for looping over in the next setp) or are
+			# the mostGeneralClassifier
+			else:
+				tmpCorrectSet.append(classifier)
+				# TEST: does this include everything from the correctSet minue the most general?
 
 		# Perform subsumption if a suitable mostGeneralClassifier was found
 		if len(mostGeneralClassifier.rules.centres) != 0:
 			####################################
 			for classifier in tmpCorrectSet:
-			# KEVIN: tmpCorrectSet wasn't being used as a class element so the "self" reference was removed
 				if self.isMoreGeneral(mostGeneralClassifier, classifier):
 					mostGeneralClassifier.numerosity += classifier.numerosity
 				else:
 					self.correctSet.append(classifier)
 			# KEVIN: Modified to append straight to correctSet if not subsumed
 			####################################
-			# Return mostGeneralClassifier to correct set if it isnt the dummy one
+			# Return mostGeneralClassifier to correct set if it isn't the dummy one
 			self.correctSet.append(mostGeneralClassifier)
