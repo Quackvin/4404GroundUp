@@ -4,7 +4,7 @@ import environment
 import json
 
 def main(loadPop):
-	env = environment.Environment('data.txt')
+	env = environment.Environment('dataFull.txt')
 	lcs = lcsModule.LCS()
 	if loadPop:
 		loadPopulation(lcs)
@@ -16,6 +16,7 @@ def run(lcs, env, doTest):
 	for instance in env.instances:
 		lcs.currIter += 1
 
+		lcs.doMatching(instance)
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
 			lcs.formPrediction()
