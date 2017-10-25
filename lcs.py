@@ -78,9 +78,10 @@ class LCS:
 			else:
 				incorrectSet.append(classifier)
 
-		self.matchSet = incorrectSet
+		self.matchSet = incorrectSet  # matchSet currently is only consisting of incorrectSet, but the left over correct set will be added back later
 
 
+	# using currIter to give the classifier a number ID????
 	def doCovering(self, instance):
 		outcome = instance.outcome
 		rules = classifierModule.Rules()
@@ -98,7 +99,7 @@ class LCS:
 	def updateParameters(self):
 		matchSetSize = len(self.correctSet) + len(self.matchSet)
 		for classifier in self.correctSet:
-			classifier.matchCount += 1
+			classifier.matchCount   += 1
 			classifier.correctCount += 1
 			classifier.accuracy = classifier.correctCount / classifier.matchCount
 			classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
