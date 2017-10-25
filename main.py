@@ -4,16 +4,19 @@ import environment
 import json
 
 def main(loadPop):
-	env = environment.Environment('data.txt')
+	env = environment.Environment('dataFull.txt')
 	lcs = lcsModule.LCS()
 	if loadPop:
 		loadPopulation(lcs)
 	run(lcs, env, False)
 
 def run(lcs, env, doTest):
+	# TASK: put this in a while loop so that you complete multiple loops over the 
+	# set of instances
 	for instance in env.instances:
 		lcs.currIter += 1
 
+		lcs.doMatching(instance)
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
 			lcs.formPrediction()

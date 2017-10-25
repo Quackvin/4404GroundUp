@@ -4,3 +4,10 @@
 __pycache__
 .cache
 .idea
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.tdo
+*.gz
