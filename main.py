@@ -16,7 +16,7 @@ def run(lcs, env, doTest):
 	for instance in env.instances:
 		lcs.currIter += 1
 
-		lcs.doMatching(instance)
+		matchSetSize = lcs.doMatching(instance)
 		'''	---NOT IMPLEMENTED YET---'''
 		if(doTest):
 			lcs.formPrediction()
@@ -25,10 +25,10 @@ def run(lcs, env, doTest):
 			lcs.doCorrectSet(instance)
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
-			lcs.updateParameters()
-			if len(lcs.correctSet) > 3: 				# needs more conditions
-				lcs.GA(instance.features)			 	# includes GA subsumption
-			lcs.doCorrectSetSubsumption()
+			lcs.updateParameters(matchSetSize)
+			# if len(lcs.correctSet) > 3: 				# needs more conditions
+			# 	lcs.GA(instance.features)			 	# includes GA subsumption
+			# lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
 			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
@@ -44,9 +44,15 @@ def run(lcs, env, doTest):
 	savePopulation(lcs.population)
 
 def savePopulation(population):
+	for classifier in population:
+		print(classifier.__dict__)
+
+	print('')
+
 	with open('classifierPopulation.json', 'w') as writeFile:
 		for classifier in population:
 			classifierDict = classifier.__dict__
+			print(classifierDict)
 			classifierDict['rules'] = classifierDict['rules'].__dict__
 			classifierString = json.dumps(classifierDict) + '\n'
 			writeFile.write(classifierString)

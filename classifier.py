@@ -24,7 +24,7 @@ class Classifier:
     # Calculated the sum of all ranges in the classifier rules that are not wildcards
     def sumRange(self):
         sum = 0
-        for i in range(0, len(self.rules)):
+        for i in range(0, len(self.rules.centres)):
             if self.rules.centres[i] != '#':
                 sum += self.rules.ranges[i]
 
@@ -38,7 +38,7 @@ class Rules:
 
         # Values to be used for upper and lower bounds in case of wildcard
         self.minLowerBound = -9999
-        self.maxUpperBound = +9999
+        self.maxUpperBound = 9999
 
 
     def getLowerBound(self, i):
