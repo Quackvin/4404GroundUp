@@ -1,5 +1,5 @@
 import classifier as classifierModule
-import random
+import random, copy
 
 class LCS:
 	# '#' indicates wildcard
@@ -14,7 +14,7 @@ class LCS:
 		self.currIter = 0
 		self.maxPopSize = 1000
 		self.coveringWildcardProbability = 0.3
-		self.initialRangeFactor = 0.1		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
+		self.initialRangeFactor = 0.5		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
 		self.powerParameter = 5					# value based on paper's stated typical value
 		self.deletionThreshold = 20
 		self.deletionFitnessScale = 0.1
@@ -44,16 +44,18 @@ class LCS:
 		self.matchSet = []
 		unmatchedPopulation = []
 
-		# matchCount = 0
+		matchCount = 0
 		# move matching classifiers from population to matchSet
 		for classifier in self.population:
 			if self.doesMatch(classifier.rules, instance.features):
 				self.matchSet.append(classifier)
-				# matchCount += 1
+				matchCount += 1
 			else:
 				unmatchedPopulation.append(classifier)
 
 		self.population = unmatchedPopulation
+
+		return matchCount
 
 
 	def doesMatch(self, classifierRules, instanceFeatures):
@@ -96,8 +98,7 @@ class LCS:
 		self.correctSet.append(classifier)
 
 
-	def updateParameters(self):
-		matchSetSize = len(self.correctSet) + len(self.matchSet)
+	def updateParameters(self, matchSetSize):
 		for classifier in self.correctSet:
 			classifier.matchCount   += 1
 			classifier.correctCount += 1
@@ -193,8 +194,8 @@ class LCS:
 		parent2 = self.selectParent()
 
 		# Initialise children
-		child1 = parent1
-		child2 = parent2
+		child1 = copy.deepcopy(parent1)
+		child2 = copy.deepcopy(parent2)
 
 		child1.numerosity = 1
 		child2.numerosity = 1
