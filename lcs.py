@@ -1,5 +1,5 @@
 import classifier as classifierModule
-import random
+import random, copy
 
 class LCS:
 	# '#' indicates wildcard
@@ -98,7 +98,6 @@ class LCS:
 
 
 	def updateParameters(self, matchSetSize):
-		# matchSetSize = len(self.correctSet) + len(self.matchSet)
 		for classifier in self.correctSet:
 			classifier.matchCount += 1
 			classifier.correctCount += 1
@@ -125,10 +124,6 @@ class LCS:
 		for classifier in self.matchSet:
 			self.population.append(classifier)
 		self.matchSet = []
-
-		# for classifier in self.population:
-		# 	print(classifier.__dict__)
-		# print('')
 
 
 	def doDeletion(self):
@@ -198,8 +193,8 @@ class LCS:
 		parent2 = self.selectParent()
 
 		# Initialise children
-		child1 = parent1
-		child2 = parent2
+		child1 = copy.deepcopy(parent1)
+		child2 = copy.deepcopy(parent2)
 
 		child1.numerosity = 1
 		child2.numerosity = 1

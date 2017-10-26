@@ -11,9 +11,13 @@ def main(loadPop):
 	run(lcs, env, False)
 
 def run(lcs, env, doTest):
-	# TASK: put this in a while loop so that you complete multiple loops over the 
-	# set of instances
+	if doTest:
+		print('**********Testing**********')
+	else:
+		print('**********Training*********')
+
 	for instance in env.instances:
+		print('iteration: ', lcs.currIter, end='\r', flush=True)
 		lcs.currIter += 1
 
 		matchSetSize = lcs.doMatching(instance)
@@ -26,9 +30,9 @@ def run(lcs, env, doTest):
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 			lcs.updateParameters(matchSetSize)
-			# if len(lcs.correctSet) > 3: 				# needs more conditions
-			# 	lcs.GA(instance.features)			 	# includes GA subsumption
-			# lcs.doCorrectSetSubsumption()
+			if len(lcs.correctSet) > 3: 				# needs more conditions
+				lcs.GA(instance.features)			 	# includes GA subsumption
+			lcs.doCorrectSetSubsumption()
 			lcs.consolidateClassifiers()
 			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
@@ -39,20 +43,16 @@ def run(lcs, env, doTest):
 		endcondition = False
 		'''-------------------------'''
 		if endcondition:
-			savePopulation(lcs.population)
-			return 0
+			break
+
 	savePopulation(lcs.population)
+	print('**********END**********')
 
 def savePopulation(population):
-	for classifier in population:
-		print(classifier.__dict__)
-
-	print('')
-
+	print('\nSaving')
 	with open('classifierPopulation.json', 'w') as writeFile:
 		for classifier in population:
 			classifierDict = classifier.__dict__
-			print(classifierDict)
 			classifierDict['rules'] = classifierDict['rules'].__dict__
 			classifierString = json.dumps(classifierDict) + '\n'
 			writeFile.write(classifierString)
