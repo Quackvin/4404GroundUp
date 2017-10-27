@@ -261,6 +261,13 @@ class LCS:
         if random.random() < self.probabilityCrossover:
             (child1, child2) = self.doCrossover(child1, child2)
 
+            # if crossover is done on those two children,
+            # then their classifier parameter will be set as the average of their parents
+            # as the fitness is calculated as (correct/match)^power
+            # therefore children's matchCount and correcctCount are set to be the sum of both parents'
+            child1.setFitness(parent1, parent2)
+            child2.setFitness(parent1, parent2)
+
         # Apply mutation
         self.doMutation(child1, instanceFeatures)
         self.doMutation(child2, instanceFeatures)

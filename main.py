@@ -30,7 +30,7 @@ def main(loadPop):
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('data.txt')
+    [a, b] = test('data.txt', parameterList = [10000, 2000, 0.3, 0.5, 5, 20, 0.1, 25, 0.55, 0.02, 0.1, 0.1, 20, 0.9] )
     with open('testing_result.txt', 'a') as dataFile_1:
         dataFile_1.write(str(parameterList))
         dataFile_1.write("Accuracy  " + str(a) + "Uncovered: " + str(b))
@@ -127,6 +127,6 @@ def loadPopulation(lcs):
 
             lcs.population.append(classifier)
 
-
-# main(False)
-explore()
+main(False)
+#test('data.txt' , parameterList = [10000, 2000, 0.3, 0.5, 5, 20, 0.1, 25, 0.55, 0.02, 0.1, 0.1, 20, 0.9] )
+#explore()
