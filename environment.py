@@ -1,5 +1,9 @@
 class Environment:
     def __init__(self, datafile):
+        """
+
+        :rtype: object
+        """
         self.instances = self.parseDatafile(datafile)
 
     def parseDatafile(self, datafile):
