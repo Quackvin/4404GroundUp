@@ -6,7 +6,7 @@ import random, copy
 class LCS:
     # '#' indicates wildcard
     # correct count is used as the analog for experience (in classifier parameters)
-    def __init__(self, parameterList):
+    def __init__(self, parameterList , log):
         """"
         :parameterList :
         """
@@ -14,6 +14,7 @@ class LCS:
         self.population = []
         self.matchSet = []
         self.correctSet = []
+        self.log = log
 
         # General parameters
         self.maxNumberOfIteration =         parameterList[0]
@@ -38,6 +39,7 @@ class LCS:
         self.correctSetSubsumption = True
         self.subsumeExpThreshold =          parameterList[2]
         self.subsumeAccuracyThreshold =     parameterList[13]
+
 
     # def __init__(self):
     #     # Sets
@@ -131,6 +133,10 @@ class LCS:
                 rules.centres.append(feat)
                 rules.ranges.append(abs(feat) * self.initialRangeFactor)
         classifier = (classifierModule.Classifier(self.currIter, outcome, rules))
+
+        # when a classifier is generated from covering, set its lastGAiteration as teh current iteration
+        classifier.lastGAIteration = self.currIter
+
         self.correctSet.append(classifier)
 
 
@@ -245,8 +251,14 @@ class LCS:
         self.updateLastGAIterations()
 
         # Select parents
-        parent1 = self.selectParent()
-        parent2 = self.selectParent()
+        # parent1 = self.selectParent()
+        # parent2 = self.selectParent()
+
+        # using selectParent_nonrepeat()
+        [parent1 ,parent2] = self.selectParents_nonrepreat()
+        # print("hahahahah " + str(len(aaa)))
+        # parent1 = aaa[0]
+        # parent2 = aaa[1]
 
         # Initialise children
         child1 = copy.deepcopy(parent1)
@@ -294,6 +306,21 @@ class LCS:
         if self.correctSetSubsumption:
             self.doCorrectSetSubsumption()
 
+    # getAverageTimePeriod()
+    # calculate and return the average time periiod since the last GA for the correctSet
+    def getAverageTimePeriod(self):
+        """"
+        :return avgTs average time period since last GA for the whole correctSet
+        """
+        ts = 0
+        numerositySum = 0
+        for classifier in self.correctSet:
+            ts += (self.currIter - classifier.lastGAIteration) * classifier.numerosity
+            numerositySum += classifier.numerosity
+
+        avgTs = ts/numerositySum
+        print("Average Time Period: "+str(avgTs))
+        return avgTs
 
     # updateLastGAIterations
     # Called by GA
@@ -301,6 +328,57 @@ class LCS:
     def updateLastGAIterations(self):
         for classifier in self.correctSet:
             classifier.lastGAIteration = self.currIter
+
+    # selectParents
+    # Called by GA
+    # Select two parents classifiers for GA from correct set using Roulette-Wheel Selection.
+    # With Roulette-Wheel Selection, the probability of selecting a given classifier in the
+    # correct set is proportional to its fitness.
+    # It is made sure that the parents selected are not identical
+    def selectParents_nonrepreat(self):
+        """"
+        :return [ parent 1, parent 2]  a list containing the two parents selected from the correct set
+        """
+        fitnessSum = 0
+        for classifier in self.correctSet:
+            fitnessSum += classifier.fitness
+
+        parentsList = []
+
+        # first Roulette-Wheel Selection
+        choicePoint = random.random() * fitnessSum  # select position on wheel
+        fitnessSum2 = 0
+        for classifier in self.correctSet:
+            fitnessSum2 += classifier.fitness
+            if fitnessSum2 >= choicePoint:  # return classifier at selected position on wheel
+                parentsList.append(classifier)
+                # temporarily remove the selected classifier in the set so that this classifier will not be selected
+                # in the next draw
+                self.correctSet.remove(classifier)
+                # quit the for loop once a classifier has been drawn
+                break
+
+        # second Roulette-Wheel Selection
+        # now the fitnessSum needs to minus the fitness of the classifier that was just selected
+        fitnessSum = fitnessSum - parentsList[0].fitness
+        choicePoint = random.random() * fitnessSum  # select position on wheel
+        fitnessSum2 = 0
+        for classifier in self.correctSet:
+            fitnessSum2 += classifier.fitness
+            if fitnessSum2 >= choicePoint:  # return classifier at selected position on wheel
+                parentsList.append(classifier)
+                # quit the for loop once a classifier has been drawn
+                break
+
+        if len(parentsList) != 2:
+            msg = str(self.correctSet) + "\n"
+            self.log.logError(msg)
+            parentsList.append(parentsList[0])
+
+        # now add the temporarily removed classifier back to the correctSet
+        self.correctSet.append(parentsList[0])
+
+        return parentsList
 
 
     # selectParents
