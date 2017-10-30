@@ -208,7 +208,7 @@ class LCS:
     # classify an given instance using the classifiers in the current population
     # pass in an instance that is to be classfied
     # return a class that has the highest votes from all the classifiers in the population
-    def classifyInstance(self, instance):
+    def classifyInstance(self, instance, debug):
         classDict = {}
 
         for classifier in self.population:
@@ -225,7 +225,8 @@ class LCS:
         else:
             value = list(classDict.values())
             keys  = list(classDict.keys())
-            print(classDict)
+            if debug:
+                print(classDict)
             return keys[value.index(max(value))]
     #	 used for testing
 

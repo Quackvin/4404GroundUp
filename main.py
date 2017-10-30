@@ -26,15 +26,15 @@ def explore():
 
 
 
-def main(loadPop):
+def main(loadPop, debug):
     log = logModule.Log('testing_result_7.txt', 'error_7.txt')
-    env = environment.Environment('dataTrain.txt')
+    env = environment.Environment('features/data_means_training.txt')
     parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
-    run(lcs, env)
-    [a, b] = test('dataTest.txt', parameterList , log)
+    run(lcs, env, debug)
+    [a, b] = test('features/data_means_testing.txt', parameterList , log, debug)
     log.logTestResult(a, b, parameterList)
     with open('testing_result.txt', 'a') as dataFile_1:
         dataFile_1.write("--------------------------------------------------------------------------------------------")
@@ -42,7 +42,7 @@ def main(loadPop):
         dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
 
 
-def test(testfile , parameterList , log):
+def test(testfile , parameterList , log, debug):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
     loadPopulation(lcs)
@@ -56,9 +56,9 @@ def test(testfile , parameterList , log):
 
     for instance in env.instances:
         numberOfInstance += 1
-        result = lcs.classifyInstance(instance)
-
-        print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
+        result = lcs.classifyInstance(instance, debug)
+        if debug:
+            print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
         if result == -1:
             numberOfUncovered += 1
             # if instance.outcome in actualClassDict:
@@ -75,7 +75,7 @@ def test(testfile , parameterList , log):
     return [result, numberOfUncovered]
 
 
-def run(lcs, env):
+def run(lcs, env, debug):
     print('**********Training*********')
     while True:
 
@@ -88,7 +88,8 @@ def run(lcs, env):
             #     [a, b] = test('dataTest.txt', lcs.parameterList, lcs.log)
             #     lcs.log.logTestResult(a, b, lcs.parameterList)
 
-            print('iteration: ', lcs.currIter)
+            if debug:
+                print('iteration: ', lcs.currIter)
             lcs.currIter += 1
 
             matchSetSize = lcs.doMatching(instance)
@@ -105,9 +106,11 @@ def run(lcs, env):
 
             # print("hahah  " + str(lcs.getAverageTimePeriod()))
             # print("GAthreshold  " + str(lcs.GAThreshold))
-            print("---CorrectSet size:  " + str(len(lcs.correctSet)))
+            if debug:
+                print("---CorrectSet size:  " + str(len(lcs.correctSet)))
             if (len(lcs.correctSet) > 2 ): #and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
-                print("running GA..............................................")
+                if debug:
+                    print("running GA..............................................")
                 lcs.GA(instance.features)  # includes GA subsumption
             lcs.doCorrectSetSubsumption()
             lcs.consolidateClassifiers()
@@ -155,7 +158,7 @@ def loadPopulation(lcs):
 
             lcs.population.append(classifier)
 
-main(False)
+main(False, False)
 # log = logModule.Log('testing_result_3.txt', 'error_3.txt')
 # parameterList = [10000, 1500, 0.1, 0.4, 10, 0.2, 30, 0.45, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
 # test('data.txt' , parameterList , log )
