@@ -1,5 +1,3 @@
-import self as self
-
 import classifier as classifierModule
 import random, copy
 
@@ -38,6 +36,7 @@ class LCS:
         # Subsumption paramerers
         self.GASubsumption = True
         self.correctSetSubsumption = True
+        self.subsumptionTolerance = 0.1
         self.subsumeExpThreshold =          parameterList[2]
         self.subsumeAccuracyThreshold =     parameterList[13]
 
@@ -532,8 +531,8 @@ class LCS:
             if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
                 return False
             # If neither has a wildcard, check upper and lower bounds
-            elif subsumer.rules.getLowerBound(i) > subsumee.rules.getLowerBound(i) or \
-                subsumer.rules.getUpperBound(i) < subsumee.rules.getUpperBound(i):
+            elif subsumer.rules.getLowerBound(i)  > subsumee.rules.getLowerBound(i) or \
+                 subsumer.rules.getUpperBound(i) * (1+ self.subsumptionTolerance) < subsumee.rules.getUpperBound(i) :
                 return False
 
         return True

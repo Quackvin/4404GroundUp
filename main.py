@@ -29,7 +29,7 @@ def explore():
 def main(loadPop):
     log = logModule.Log('testing_result_7.txt', 'error_7.txt')
     env = environment.Environment('dataTrain.txt')
-    parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2 ,55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
@@ -50,12 +50,19 @@ def test(testfile , parameterList , log):
     correctCount = 0
     numberOfInstance = 0
     numberOfUncovered = 0
+
+    # resultClassDict = {}
+    # actualClassDict = {}
+
     for instance in env.instances:
         numberOfInstance += 1
         result = lcs.classifyInstance(instance)
+
         print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
         if result == -1:
             numberOfUncovered += 1
+            # if instance.outcome in actualClassDict:
+                #actualClassDict[instance.outcome]
 
         if (result == instance.outcome):
             correctCount += 1
@@ -120,7 +127,7 @@ def run(lcs, env):
 
 def savePopulation(population):
     print('\nSaving')
-    with open('classifierPopulation_3.json', 'w') as writeFile:
+    with open('classifierPopulation_4.json', 'w') as writeFile:
         for classifier in population:
             classifierDict = classifier.__dict__
             classifierDict['rules'] = classifierDict['rules'].__dict__
@@ -129,7 +136,7 @@ def savePopulation(population):
 
 
 def loadPopulation(lcs):
-    with open('classifierPopulation_3.json', 'r') as readFile:
+    with open('classifierPopulation_4.json', 'r') as readFile:
         for classifierStr in readFile:
             classifierDict = json.loads(classifierStr)
 
