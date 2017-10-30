@@ -18,11 +18,12 @@ with open('meta.txt','r') as metaFile:
 		categories[clss] = ''
 
 count = 0
-for filename in os.listdir('.'):
+for filename in os.listdir('./pickles'):
 	if filename.endswith('.cpickle'):
 		# get file name
 		nameId = re.sub(r'\.cpickle', '', filename)
 
+		filename = './pickles/' + filename
 		data = pickle.load(open(filename,'rb'))
 
 		data = np.array(data['feat'][0])
