@@ -6,31 +6,36 @@ import log as logModule
 
 
 def explore():
-    log = logModule.Log('testing_result_3.txt' , 'error_3.txt')
-    for a in [10000, 15000, 200000]:
-        for b in [1500, 2000, 2500, 3000]:
-            for c in [0.1, 0.2, 0.3, 0.4]:
-                for d in [0.2, 0.4, 0.6]:
-                    for e in [3, 4, 5]:
-                        for f in [20, 25, 30]:
-                            for h in [0.1, 0.2, 0.3]:
-                                for i in [25, 50, 75]:
+    log = logModule.Log('testing_result_6.txt' , 'error_6.txt')
+    # for a in [10000, 15000, 200000]:
+    # for b in [200, 400, 600, 1000]:
+    for c in [0.3, 0.6, 0.8]:
+        for d in [0.6, 0.4, 0.2]:
+            for e in [3, 4, 5]:
+                for f in [20, 25, 30]:
+                    for h in [0.1, 0.2, 0.3]:
+                        for i in [25, 50, 75]:
+                            for j in [0.15, 0.25, 0.35,0.55]:
+                                for k in [0.01, 0.02, 0.03, 0.1]:
                                     env = environment.Environment('dataTrain.txt')
-                                    parameterList = [a, b, c, d, e, f, h, i, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
+                                    parameterList = [10000, 2500, c, d, e, f, h, i, j, k, 0.1, 0.1, 20, 0.9]
                                     lcs = lcsModule.LCS(parameterList , log)
                                     run(lcs, env)
                                     [x, y] = test('dataTest.txt' , parameterList , log)
                                     log.logTestResult(x,y,parameterList)
 
 
+
 def main(loadPop):
+    log = logModule.Log('testing_result_7.txt', 'error_7.txt')
     env = environment.Environment('dataTrain.txt')
-    parameterList = [10000, 2000, 0.3, 0.5, 5, 20, 0.1, 50, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
-    lcs = lcsModule.LCS(parameterList)
+    parameterList = [5000, 3200, 0.35, 0.5, 5, 30, 0.2 ,55, 0.3, 0.02, 0.1, 0.1, 20, 0.9]
+    lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('dataTest.txt', parameterList = [10000, 2000, 0.3, 0.5, 5, 20, 0.1, 25, 0.55, 0.02, 0.1, 0.1, 20, 0.9] )
+    [a, b] = test('dataTest.txt', parameterList , log)
+    log.logTestResult(a, b, parameterList)
     with open('testing_result.txt', 'a') as dataFile_1:
         dataFile_1.write("--------------------------------------------------------------------------------------------")
         dataFile_1.write(str(parameterList) + "\n")
@@ -66,7 +71,16 @@ def test(testfile , parameterList , log):
 def run(lcs, env):
     print('**********Training*********')
     while True:
+
         for instance in env.instances:
+
+            # if lcs.currIter == 10000:
+            #     print("===============================================================================================")
+            #     print("Tetsing Start")
+            #     savePopulation(lcs.population)
+            #     [a, b] = test('dataTest.txt', lcs.parameterList, lcs.log)
+            #     lcs.log.logTestResult(a, b, lcs.parameterList)
+
             print('iteration: ', lcs.currIter)
             lcs.currIter += 1
 
@@ -82,10 +96,11 @@ def run(lcs, env):
             lcs.updateParameters(matchSetSize)
             #if len(lcs.correctSet) > 3:  # needs more conditions
 
-            print("hahah  " + str(lcs.getAverageTimePeriod()))
-            print("GAthreshold  " + str(lcs.GAThreshold))
-            if (len(lcs.correctSet) > 3 ): #and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
-                print("running GA")
+            # print("hahah  " + str(lcs.getAverageTimePeriod()))
+            # print("GAthreshold  " + str(lcs.GAThreshold))
+            print("---CorrectSet size:  " + str(len(lcs.correctSet)))
+            if (len(lcs.correctSet) > 2 ): #and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
+                print("running GA..............................................")
                 lcs.GA(instance.features)  # includes GA subsumption
             lcs.doCorrectSetSubsumption()
             lcs.consolidateClassifiers()
@@ -105,7 +120,7 @@ def run(lcs, env):
 
 def savePopulation(population):
     print('\nSaving')
-    with open('classifierPopulation_2.json', 'w') as writeFile:
+    with open('classifierPopulation_3.json', 'w') as writeFile:
         for classifier in population:
             classifierDict = classifier.__dict__
             classifierDict['rules'] = classifierDict['rules'].__dict__
@@ -114,7 +129,7 @@ def savePopulation(population):
 
 
 def loadPopulation(lcs):
-    with open('classifierPopulation_2.json', 'r') as readFile:
+    with open('classifierPopulation_3.json', 'r') as readFile:
         for classifierStr in readFile:
             classifierDict = json.loads(classifierStr)
 
@@ -133,6 +148,8 @@ def loadPopulation(lcs):
 
             lcs.population.append(classifier)
 
-#main(False)
-#test('data.txt' , parameterList = [10000, 2000, 0.3, 0.5, 5, 20, 0.1, 25, 0.55, 0.02, 0.1, 0.1, 20, 0.9] )
-explore()
+main(False)
+# log = logModule.Log('testing_result_3.txt', 'error_3.txt')
+# parameterList = [10000, 1500, 0.1, 0.4, 10, 0.2, 30, 0.45, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
+# test('data.txt' , parameterList , log )
+# explore()

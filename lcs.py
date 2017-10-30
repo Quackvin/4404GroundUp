@@ -15,6 +15,7 @@ class LCS:
         self.matchSet = []
         self.correctSet = []
         self.log = log
+        self.parameterList = parameterList
 
         # General parameters
         self.maxNumberOfIteration =         parameterList[0]
