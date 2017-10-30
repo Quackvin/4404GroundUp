@@ -29,7 +29,7 @@ def explore():
 def main(loadPop):
     log = logModule.Log('testing_result_7.txt', 'error_7.txt')
     env = environment.Environment('dataTrain.txt')
-    parameterList = [5000, 3200, 0.35, 0.5, 5, 30, 0.2 ,55, 0.3, 0.02, 0.1, 0.1, 20, 0.9]
+    parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2 ,55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
