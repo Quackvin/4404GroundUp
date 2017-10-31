@@ -319,7 +319,7 @@ class LCS:
             numerositySum += classifier.numerosity
 
         avgTs = ts/numerositySum
-        print("Average Time Period: "+str(avgTs))
+        # print("Average Time Period: "+str(avgTs))
         return avgTs
 
     # updateLastGAIterations
