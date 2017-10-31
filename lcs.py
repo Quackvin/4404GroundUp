@@ -147,8 +147,14 @@ class LCS:
             voteSum = voteSum + self.deletionVote(self.population[i], popAveFitness)
             if voteSum >= choicePoint:
                 if self.population[i].numerosity > 1:
+                    # print('Deleting Classifier With Fitness:')
+                    # print(str(self.population[i].fitness) + '\nAccuracy:')
+                    # print(str(self.population[i].accuracy))
                     self.population[i].numerosity -= 1
                 else:
+                    # print('Deleting Classifier With Fitness:')
+                    # print('\t' + str(self.population[i].fitness) + '\nAccuracy:')
+                    # print('\t' + str(self.population[i].accuracy))
                     self.population.pop(i)
                 break
 
