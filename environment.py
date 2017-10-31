@@ -1,3 +1,5 @@
+import os
+
 class Environment:
     def __init__(self, datafile):
         """

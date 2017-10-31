@@ -27,16 +27,16 @@ def explore():
 
 
 def main(loadPop, debug):
-    log = logModule.Log('testing_result_7.txt', 'error_7.txt')
+    log = logModule.Log('testing_result_k.txt', 'error_k.txt')
     env = environment.Environment('features/data_means_training.txt')
-    parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env, debug)
-    [a, b] = test('features/data_means_testing.txt', parameterList , log, debug)
+    [a, b] = test('./features/data_means_testing.txt', parameterList , log, debug)
     log.logTestResult(a, b, parameterList)
-    with open('testing_result.txt', 'a') as dataFile_1:
+    with open('testing_no_means_result.txt', 'a') as dataFile_1:
         dataFile_1.write("--------------------------------------------------------------------------------------------")
         dataFile_1.write(str(parameterList) + "\n")
         dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
@@ -78,9 +78,7 @@ def test(testfile , parameterList , log, debug):
 def run(lcs, env, debug):
     print('**********Training*********')
     while True:
-
         for instance in env.instances:
-
             # if lcs.currIter == 10000:
             #     print("===============================================================================================")
             #     print("Tetsing Start")
@@ -88,8 +86,7 @@ def run(lcs, env, debug):
             #     [a, b] = test('dataTest.txt', lcs.parameterList, lcs.log)
             #     lcs.log.logTestResult(a, b, lcs.parameterList)
 
-            if debug:
-                print('iteration: ', lcs.currIter)
+            print('iteration: ', lcs.currIter, end='\r', flush=True)
             lcs.currIter += 1
 
             matchSetSize = lcs.doMatching(instance)
@@ -130,7 +127,7 @@ def run(lcs, env, debug):
 
 def savePopulation(population):
     print('\nSaving')
-    with open('classifierPopulation_4.json', 'w') as writeFile:
+    with open('classifierPopulation_no_means.json', 'w') as writeFile:
         for classifier in population:
             classifierDict = classifier.__dict__
             classifierDict['rules'] = classifierDict['rules'].__dict__
@@ -139,7 +136,7 @@ def savePopulation(population):
 
 
 def loadPopulation(lcs):
-    with open('classifierPopulation_4.json', 'r') as readFile:
+    with open('classifierPopulation_no_means.json', 'r') as readFile:
         for classifierStr in readFile:
             classifierDict = json.loads(classifierStr)
 
