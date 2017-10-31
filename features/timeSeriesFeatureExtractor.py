@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 import re
+import matplotlib.pyplot as plt
 
 # run this script with no arguments in the folder with all the cpickle files.
 # will create a file called data.txt if it doesn't exist already, otherwise will overwrite it
@@ -14,6 +15,7 @@ with open('meta.txt','r') as metaFile:
 		line = line.split('\t')[0:2]
 		name = re.search(r'/(.+)\.',line[0]).group()[1:-1]
 		clss = line[1]
+		clss = re.sub(r'/', '_', clss)
 		files[name] = clss
 
 allFeats = ''
@@ -30,19 +32,15 @@ for filename in os.listdir('./pickles'):
 
 		instanceFeatures = ''
 
-		print(np.shape(data)[0])
-		# for feature in range(0,40):
-		# 	featureSlices = data[:,feature]
-		# 	instanceFeatures += str(np.mean(featureSlices)) + '\t'
-		# 	instanceFeatures += str(np.std(featureSlices)) + '\t'
-		# 	if feature == 39:
-		# 		outcome = files[nameId]
-		# 		if outcome != targetOutcome:
-		# 			outcome = 'other'
-		# 		instanceFeatures += outcome + '\n'
+
+		for i in range(np.shape(data)[1]):
+			plt.plot(data[i,:])
+			# print(np.shape(np.fft.rfft(data[:,i])))
+		# plt.plot(data[0,:])
+		plt.show()
 		count += 1
-		if count > 10:
-			break
+	if count>20:
+		break
 
 		# print(instanceFeatures)
 	allFeats += instanceFeatures
