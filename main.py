@@ -28,18 +28,18 @@ def explore():
 
 def main(loadPop):
     log = logModule.Log('testing_result_7.txt', 'error_7.txt')
-    env = environment.Environment('dataTrain.txt')
-    parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    env = environment.Environment('dataFull.txt')
+    parameterList = [5000, 200, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('dataTest.txt', parameterList , log)
-    log.logTestResult(a, b, parameterList)
-    with open('testing_result.txt', 'a') as dataFile_1:
-        dataFile_1.write("--------------------------------------------------------------------------------------------")
-        dataFile_1.write(str(parameterList) + "\n")
-        dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
+    # [a, b] = test('dataFull.txt', parameterList , log)
+    # log.logTestResult(a, b, parameterList)
+    # with open('testing_result.txt', 'a') as dataFile_1:
+    #     dataFile_1.write("--------------------------------------------------------------------------------------------")
+    #     dataFile_1.write(str(parameterList) + "\n")
+    #     dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
 
 
 def test(testfile , parameterList , log):
@@ -88,15 +88,10 @@ def run(lcs, env):
             #     [a, b] = test('dataTest.txt', lcs.parameterList, lcs.log)
             #     lcs.log.logTestResult(a, b, lcs.parameterList)
 
-            print('iteration: ', lcs.currIter)
             lcs.currIter += 1
 
             matchSetSize = lcs.doMatching(instance)
-            '''	---NOT IMPLEMENTED YET---'''
-            # if (doTest):
-            #    lcs.formPrediction()
-            #    '''-------------------'''
-            # else:
+
             lcs.doCorrectSet(instance)
             if len(lcs.correctSet) == 0:
                 lcs.doCovering(instance)
@@ -105,11 +100,15 @@ def run(lcs, env):
 
             # print("hahah  " + str(lcs.getAverageTimePeriod()))
             # print("GAthreshold  " + str(lcs.GAThreshold))
-            print("---CorrectSet size:  " + str(len(lcs.correctSet)))
             if (len(lcs.correctSet) > 2 ): #and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
-                print("running GA..............................................")
+                print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run')
                 lcs.GA(instance.features)  # includes GA subsumption
-            lcs.doCorrectSetSubsumption()
+            else:
+                print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)))
+
+            if lcs.doCorrectSetSubsumption:
+                lcs.correctSetSubsumption()
+
             lcs.consolidateClassifiers()
             if len(lcs.population) > lcs.maxPopSize:
                 lcs.doDeletion()
@@ -158,5 +157,5 @@ def loadPopulation(lcs):
 main(False)
 # log = logModule.Log('testing_result_3.txt', 'error_3.txt')
 # parameterList = [10000, 1500, 0.1, 0.4, 10, 0.2, 30, 0.45, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
-# test('data.txt' , parameterList , log )
+# test('dataFull.txt' , parameterList , log )
 # explore()

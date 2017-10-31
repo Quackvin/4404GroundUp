@@ -53,15 +53,15 @@ class Rules:
         self.maxUpperBound = 9999
 
 
-    def getLowerBound(self, i):
+    def getLowerBound(self, i, extra):
         if self.centres[i] == '#':
             return self.minLowerBound
 
-        return self.centres[i] - self.ranges[i]
+        return self.centres[i] - (1 + extra) * self.ranges[i]
 
 
-    def getUpperBound(self, i):
+    def getUpperBound(self, i, extra):
         if self.centres[i] == '#':
             return self.maxUpperBound
 
-        return self.centres[i] + self.ranges[i]
+        return self.centres[i] + (1 + extra) * self.ranges[i]

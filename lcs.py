@@ -35,9 +35,9 @@ class LCS:
 
         # Subsumption paramerers
         self.GASubsumption = True
-        self.correctSetSubsumption = True
-        self.subsumptionTolerance = 0.1
-        self.subsumeExpThreshold =          parameterList[2]
+        self.doCorrectSetSubsumption = True
+        self.subsumptionTolerance = 0.5
+        self.subsumeExpThreshold =          parameterList[12]
         self.subsumeAccuracyThreshold =     parameterList[13]
 
 
@@ -100,9 +100,9 @@ class LCS:
         for i in range(len(classifierRules.centres)):
             # false if not wildcard and outside range from centre
             if(classifierRules.centres[i] != "#"):
-                if(instanceFeatures[i] < classifierRules.getLowerBound(i) or
-                           instanceFeatures[i] > classifierRules.getUpperBound(i)):
-                    # print('l:',classifierRules.getLowerBound(i),'F:',instanceFeatures[i],'u:',classifierRules.getUpperBound(i))
+                if(instanceFeatures[i] < classifierRules.getLowerBound(i,0) or
+                           instanceFeatures[i] > classifierRules.getUpperBound(i,0)):
+                    # print('l:',classifierRules.getLowerBound(i,0),'F:',instanceFeatures[i],'u:',classifierRules.getUpperBound(i,0))
                     return False
         return True
 
@@ -255,10 +255,7 @@ class LCS:
         # parent2 = self.selectParent()
 
         # using selectParent_nonrepeat()
-        [parent1 ,parent2] = self.selectParents_nonrepreat()
-        # print("hahahahah " + str(len(aaa)))
-        # parent1 = aaa[0]
-        # parent2 = aaa[1]
+        [parent1, parent2] = self.selectParents_nonrepreat()
 
         # Initialise children
         child1 = copy.deepcopy(parent1)
@@ -292,6 +289,7 @@ class LCS:
             elif self.doesSubsume(parent2, child1):
                 parent2.numerosity += 1
             else:
+                #print("... child 1 added to population")
                 self.correctSet.append(child1)
 
             # Second child
@@ -300,27 +298,24 @@ class LCS:
             elif self.doesSubsume(parent2, child2):
                 parent2.numerosity += 1
             else:
+                #print("... child 2 added to population")
                 self.correctSet.append(child2)
-
-        # Apply correct set subsumption
-        if self.correctSetSubsumption:
-            self.doCorrectSetSubsumption()
 
     # getAverageTimePeriod()
     # calculate and return the average time periiod since the last GA for the correctSet
-    def getAverageTimePeriod(self):
-        """"
-        :return avgTs average time period since last GA for the whole correctSet
-        """
-        ts = 0
-        numerositySum = 0
-        for classifier in self.correctSet:
-            ts += (self.currIter - classifier.lastGAIteration) * classifier.numerosity
-            numerositySum += classifier.numerosity
-
-        avgTs = ts/numerositySum
-        print("Average Time Period: "+str(avgTs))
-        return avgTs
+    # def getAverageTimePeriod(self):
+    #     """"
+    #     :return avgTs average time period since last GA for the whole correctSet
+    #     """
+    #     ts = 0
+    #     numerositySum = 0
+    #     for classifier in self.correctSet:
+    #         ts += (self.currIter - classifier.lastGAIteration) * classifier.numerosity
+    #         numerositySum += classifier.numerosity
+    #
+    #     avgTs = ts/numerositySum
+    #     print("Average Time Period: "+str(avgTs))
+    #     return avgTs
 
     # updateLastGAIterations
     # Called by GA
@@ -386,17 +381,17 @@ class LCS:
     # Select a parents classifiers for GA from correct set using Roulette-Wheel Selection.
     # With Roulette-Wheel Selection, the probability of selecting a given classifier in the
     # correct set is proportional to its fitness.
-    def selectParent(self):
-        fitnessSum = 0
-        for classifier in self.correctSet:
-            fitnessSum += classifier.fitness
-
-        choicePoint = random.random()*fitnessSum  # select position on wheel
-        fitnessSum = 0
-        for classifier in self.correctSet:
-            fitnessSum += classifier.fitness
-            if fitnessSum >= choicePoint:  # return classifier at selected position on wheel
-                return classifier
+    # def selectParent(self):
+    #     fitnessSum = 0
+    #     for classifier in self.correctSet:
+    #         fitnessSum += classifier.fitness
+    #
+    #     choicePoint = random.random()*fitnessSum  # select position on wheel
+    #     fitnessSum = 0
+    #     for classifier in self.correctSet:
+    #         fitnessSum += classifier.fitness
+    #         if fitnessSum >= choicePoint:  # return classifier at selected position on wheel
+    #             return classifier
 
 
     # doCrossover
@@ -531,21 +526,21 @@ class LCS:
             if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
                 return False
             # If neither has a wildcard, check upper and lower bounds
-            elif subsumer.rules.getLowerBound(i)  > subsumee.rules.getLowerBound(i) or \
-                 subsumer.rules.getUpperBound(i) * (1+ self.subsumptionTolerance) < subsumee.rules.getUpperBound(i) :
+            elif subsumer.rules.getLowerBound(i, self.subsumptionTolerance) > subsumee.rules.getLowerBound(i, 0) or \
+                 subsumer.rules.getUpperBound(i, self.subsumptionTolerance) < subsumee.rules.getUpperBound(i, 0) :
                 return False
 
         return True
 
 
-    # doCorrectSetSubsumption
+    # correctSetSubsumption
     # Called by main (before GA)
     # Searches the correct set for the most general classifier that is sufficiently experienced
     # and accurate to be used for subsumption. All other classifiers in the correct set are then
     # compared to this for potential subsumption. Valid subsumees are subsumed with their
     # numerosity added to that of the most general classifier. Subsumed classifiers are deleted
     # from the correct set.
-    def doCorrectSetSubsumption(self):
+    def correctSetSubsumption(self):
         # Initialise most general classifier variable
         initRules = classifierModule.Rules()
         mostGeneralClassifier = classifierModule.Classifier(self.currIter, 0, initRules)
@@ -577,9 +572,13 @@ class LCS:
 
         # Perform subsumption if a suitable mostGeneralClassifier was found
         if len(mostGeneralClassifier.rules.centres) != 0:
-            self.correctSet = []	# reset correct set
+
+            print("... doing correct set subsumption")
+
+            self.correctSet = []   # reset correct set
             for classifier in tmpCorrectSet:
                 if self.isMoreGeneral(mostGeneralClassifier, classifier):
+                    print("... subsumed a classifier")
                     mostGeneralClassifier.numerosity += classifier.numerosity
                 else:
                     self.correctSet.append(classifier)
