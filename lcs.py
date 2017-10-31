@@ -225,7 +225,7 @@ class LCS:
         else:
             value = list(classDict.values())
             keys  = list(classDict.keys())
-            print(classDict)
+            # print(classDict)
             return keys[value.index(max(value))]
     #	 used for testing
 
@@ -302,20 +302,20 @@ class LCS:
                 self.correctSet.append(child2)
 
     # getAverageTimePeriod()
-    # calculate and return the average time periiod since the last GA for the correctSet
-    # def getAverageTimePeriod(self):
-    #     """"
-    #     :return avgTs average time period since last GA for the whole correctSet
-    #     """
-    #     ts = 0
-    #     numerositySum = 0
-    #     for classifier in self.correctSet:
-    #         ts += (self.currIter - classifier.lastGAIteration) * classifier.numerosity
-    #         numerositySum += classifier.numerosity
-    #
-    #     avgTs = ts/numerositySum
-    #     print("Average Time Period: "+str(avgTs))
-    #     return avgTs
+    calculate and return the average time periiod since the last GA for the correctSet
+    def getAverageTimePeriod(self):
+        """"
+        :return avgTs average time period since last GA for the whole correctSet
+        """
+        ts = 0
+        numerositySum = 0
+        for classifier in self.correctSet:
+            ts += (self.currIter - classifier.lastGAIteration) * classifier.numerosity
+            numerositySum += classifier.numerosity
+    
+        avgTs = ts/numerositySum
+        print("Average Time Period: "+str(avgTs))
+        return avgTs
 
     # updateLastGAIterations
     # Called by GA

@@ -4,6 +4,40 @@ import environment
 import json
 import log as logModule
 
+def explore2():
+    parameterLists = [
+        # [600, 200, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # # population size change
+        # [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [5000, 2000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [5000, 3000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # # covering probability change
+        # [5000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [5000, 2000, 0.4, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [5000, 2000, 0.5, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # # initial factor range change
+        # [5000, 2000, 0.3, 0.6, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [5000, 2000, 0.3, 0.1, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        #
+        # # change iteration
+        # [10000, 700, 0.3,  0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [10000, 1000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        # [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.7, 0.02, 0.1, 0.1, 20, 0.9],
+        [15000, 2000, 0.3, 0.5, 5, 30, 0.2, 55,  0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        [15000, 2000, 0.3, 0.5, 5, 30, 0.2, 75,  0.5, 0.02, 0.1, 0.1, 20, 0.9],
+        [15000, 2000, 0.3, 0.5, 5, 30, 0.2, 155, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+
+    ]
+    for i in range(len(parameterLists)):
+        log = logModule.Log('Result2_'+str(i)+'.txt', 'Result2_'+str(i)+'.txt')
+        env = environment.Environment('dataTrain.txt')
+        parameterList = parameterLists[i]
+        lcs = lcsModule.LCS(parameterList, log)
+        run(lcs, env)
+        [a, b] = test('dataTest.txt', parameterList, log)
+        log.logTestResult(a, b, parameterList)
+
 
 def explore():
     log = logModule.Log('testing_result_6.txt' , 'error_6.txt')
@@ -42,35 +76,49 @@ def main(loadPop):
     #     dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
 
 
-def test(testfile , parameterList , log):
+def test(testfile , parameterList , log ):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
-    loadPopulation(lcs)
+    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
     env = environment.Environment(testfile)
     correctCount = 0
     numberOfInstance = 0
     numberOfUncovered = 0
 
-    # resultClassDict = {}
-    # actualClassDict = {}
+    confusionMatrix        = env.initConfusionMatrix()
+    confusionMatrix_ratio  = env.initConfusionMatrix()
 
     for instance in env.instances:
+
         numberOfInstance += 1
         result = lcs.classifyInstance(instance)
 
-        print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
+        # print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
         if result == -1:
             numberOfUncovered += 1
-            # if instance.outcome in actualClassDict:
-                #actualClassDict[instance.outcome]
+            confusionMatrix[instance.outcome]["Uncovered"] += 1
+        else:
+            confusionMatrix[instance.outcome][result] += 1
 
-        if (result == instance.outcome):
+        if result == instance.outcome:
             correctCount += 1
 
     result = correctCount / numberOfInstance
     print("---Accuracy: " + str(result))
     print("---Number of uncovered instances:" + str(numberOfUncovered))
     print('**********Testing Done*********')
+
+    for cls in confusionMatrix:
+        class_occurance_sum = 0
+        for cls2 in confusionMatrix[cls]:
+            class_occurance_sum += confusionMatrix[cls][cls2]
+
+        for cls3 in confusionMatrix[cls]:
+            confusionMatrix_ratio[cls][cls3] = confusionMatrix[cls][cls3]/class_occurance_sum
+
+
+    log.logMessage("Confusion Matrix: " + str(confusionMatrix))
+    log.logMessage("Confusion Ration Matrix: " + str(confusionMatrix_ratio))
 
     return [result, numberOfUncovered]
 
@@ -81,12 +129,14 @@ def run(lcs, env):
 
         for instance in env.instances:
 
-            # if lcs.currIter == 10000:
-            #     print("===============================================================================================")
-            #     print("Tetsing Start")
+            # if lcs.currIter !=0 and lcs.currIter % 500 == 0:
+            # #     print("===============================================================================================")
+            # #     print("Tetsing Start")
             #     savePopulation(lcs.population)
-            #     [a, b] = test('dataTest.txt', lcs.parameterList, lcs.log)
+            #     lcs.log.logMessage("Result at iteration   " + str(lcs.currIter))
+            #     [a, b] = test('data.txt', lcs.parameterList, lcs.log)
             #     lcs.log.logTestResult(a, b, lcs.parameterList)
+            #     loadPopulation(lcs)
 
             lcs.currIter += 1
 
@@ -96,19 +146,19 @@ def run(lcs, env):
             if len(lcs.correctSet) == 0:
                 lcs.doCovering(instance)
             lcs.updateParameters(matchSetSize)
-            #if len(lcs.correctSet) > 3:  # needs more conditions
-
-            # print("hahah  " + str(lcs.getAverageTimePeriod()))
-            # print("GAthreshold  " + str(lcs.GAThreshold))
-            if (len(lcs.correctSet) > 2 ): #and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
+            
+            # GA
+            if len(lcs.correctSet) > 2 and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
                 print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run')
                 lcs.GA(instance.features)  # includes GA subsumption
             else:
                 print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)))
 
+            # Correct set subsumption
             if lcs.doCorrectSetSubsumption:
                 lcs.correctSetSubsumption()
 
+            # Put everything back in the population
             lcs.consolidateClassifiers()
             if len(lcs.population) > lcs.maxPopSize:
                 lcs.doDeletion()
@@ -119,14 +169,15 @@ def run(lcs, env):
             endcondition = lcs.currIter > lcs.maxNumberOfIteration
             '''-------------------------'''
             if endcondition:
-                savePopulation(lcs.population)
+                savePopulation(lcs.population, 'classifierPopulation'+str(lcs.parameterList)+'.json')
                 print('**********END**********')
                 return 0
 
 
-def savePopulation(population):
+def savePopulation(population, saveName):
     print('\nSaving')
-    with open('classifierPopulation_4.json', 'w') as writeFile:
+    #with open('classifierPopulation_5.json', 'w') as writeFile:
+    with open(saveName, 'w') as writeFile:
         for classifier in population:
             classifierDict = classifier.__dict__
             classifierDict['rules'] = classifierDict['rules'].__dict__
@@ -134,8 +185,9 @@ def savePopulation(population):
             writeFile.write(classifierString)
 
 
-def loadPopulation(lcs):
-    with open('classifierPopulation_4.json', 'r') as readFile:
+def loadPopulation(lcs, saveName):
+    # with open('classifierPopulation_5.json', 'r') as readFile:
+    with open(saveName, 'r') as readFile:
         for classifierStr in readFile:
             classifierDict = json.loads(classifierStr)
 
@@ -154,8 +206,8 @@ def loadPopulation(lcs):
 
             lcs.population.append(classifier)
 
-main(False)
-# log = logModule.Log('testing_result_3.txt', 'error_3.txt')
-# parameterList = [10000, 1500, 0.1, 0.4, 10, 0.2, 30, 0.45, 0.55, 0.02, 0.1, 0.1, 20, 0.9]
-# test('dataFull.txt' , parameterList , log )
-# explore()
+# main(False)
+# log = logModule.Log('testing_result_8.txt', 'error_8.txt')
+# parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+# test('dataTest.txt' , parameterList , log )
+explore2()
