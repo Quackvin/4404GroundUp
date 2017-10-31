@@ -225,7 +225,7 @@ class LCS:
         else:
             value = list(classDict.values())
             keys  = list(classDict.keys())
-            print(classDict)
+            # print(classDict)
             return keys[value.index(max(value))]
     #	 used for testing
 
