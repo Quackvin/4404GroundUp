@@ -2,10 +2,11 @@
 LCS from scratch boiii
 
 
-# Feature Extraction
+## Feature Extraction
 
-| Script   | Function                                                                                                    |
-|:----------------------------:|:-------------------------------------------------------------------------------------:|
-| separatedFeatureExtractor      | Generate class-wise data sets from cpickle files. These are stored in features/data/ |
-| splitTestAndTrain              | Separates data into testing and training sets with all classes evenly represented based on a given percentage of training data. Output files also stored in features/data/ |
+| Script | Function | Output |
+|--------|----------|--------|
+| separatedFeatureExtractor   | Generate class-wise datasets of feature mean and standard deviation from cpickle files. | class data *_data.txt files | features/data/ |
+| splitTestAndTrain           | Separates data into testing and training sets with classes evenly represented, based on a given percentage of training data. | data_testing.txt and data_training.txt | features/data/ |
+
 

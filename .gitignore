@@ -1,9 +1,12 @@
+# Pycharm related files
 *.iml
 *.xml
 *.pyc
 __pycache__
 .cache
 .idea
+
+# Latex related files
 *.aux
 *.bbl
 *.blg
@@ -11,3 +14,6 @@ __pycache__
 *.out
 *.tdo
 *.gz
+
+# Other
+Subsumption_tests

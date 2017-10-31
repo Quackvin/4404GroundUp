@@ -40,7 +40,6 @@ class Classifier:
         """
         self.matchCount = (p1.matchCount + p2.matchCount)/2
         self.correctCount = (p2.correctCount + p2.correctCount)/2
-        self.fitness = self.correctCount/self.matchCount
 
 
 class Rules:

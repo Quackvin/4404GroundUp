@@ -31,11 +31,11 @@ def explore2():
     ]
     for i in range(len(parameterLists)):
         log = logModule.Log('Result2_'+str(i)+'.txt', 'Result2_'+str(i)+'.txt')
-        env = environment.Environment('dataTrain.txt')
+        env = environment.Environment('data_training.txt')
         parameterList = parameterLists[i]
         lcs = lcsModule.LCS(parameterList, log)
         run(lcs, env)
-        [a, b] = test('dataTest.txt', parameterList, log)
+        [a, b] = test('data_testing.txt', parameterList, log)
         log.logTestResult(a, b, parameterList)
 
 
@@ -62,21 +62,21 @@ def explore():
 
 def main(loadPop):
     log = logModule.Log('testing_result_7.txt', 'error_7.txt')
-    env = environment.Environment('dataFull.txt')
-    parameterList = [5000, 200, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    env = environment.Environment('data_training.txt')
+    parameterList = [15000, 500, 0.15, 0.5, 5, 20, 0.2, 50, 0.75, 0.01, 0.5, 1, 15, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    # [a, b] = test('dataFull.txt', parameterList , log)
-    # log.logTestResult(a, b, parameterList)
-    # with open('testing_result.txt', 'a') as dataFile_1:
-    #     dataFile_1.write("--------------------------------------------------------------------------------------------")
-    #     dataFile_1.write(str(parameterList) + "\n")
-    #     dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
+    [a, b] = test('data_testing.txt', parameterList , log)
+    log.logTestResult(a, b, parameterList)
+    with open('testing_result.txt', 'a') as dataFile_1:
+        dataFile_1.write("--------------------------------------------------------------------------------------------")
+        dataFile_1.write(str(parameterList) + "\n")
+        dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
 
 
-def test(testfile , parameterList , log ):
+def test(testfile, parameterList , log):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
     loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
@@ -128,15 +128,6 @@ def run(lcs, env):
     while True:
 
         for instance in env.instances:
-
-            # if lcs.currIter !=0 and lcs.currIter % 500 == 0:
-            # #     print("===============================================================================================")
-            # #     print("Tetsing Start")
-            #     savePopulation(lcs.population)
-            #     lcs.log.logMessage("Result at iteration   " + str(lcs.currIter))
-            #     [a, b] = test('data.txt', lcs.parameterList, lcs.log)
-            #     lcs.log.logTestResult(a, b, lcs.parameterList)
-            #     loadPopulation(lcs)
 
             lcs.currIter += 1
 
@@ -206,8 +197,8 @@ def loadPopulation(lcs, saveName):
 
             lcs.population.append(classifier)
 
-# main(False)
+main(False)
 # log = logModule.Log('testing_result_8.txt', 'error_8.txt')
 # parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 # test('dataTest.txt' , parameterList , log )
-explore2()
+# explore2()

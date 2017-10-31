@@ -33,50 +33,13 @@ class LCS:
         self.probabilityWildcardMutation =  parameterList[10]
         self.mutationScale =                parameterList[11]
 
-        # Subsumption paramerers
+        # Subsumption parameters
         self.GASubsumption = True
         self.doCorrectSetSubsumption = True
         self.subsumptionTolerance = 0.5
         self.subsumeExpThreshold =          parameterList[12]
         self.subsumeAccuracyThreshold =     parameterList[13]
 
-
-    # def __init__(self):
-    #     # Sets
-    #     self.population = []
-    #     self.matchSet = []
-    #     self.correctSet = []
-    #
-    #     # General parameters
-    #     self.maxNumberOfIteration = 10000
-    #     self.currIter = 0
-    #     self.maxPopSize = 2000
-    #     self.coveringWildcardProbability = 0.3
-    #     self.initialRangeFactor = 0.5		   	# when initialising a rule, set range = abs(initialRangeFactor*centre)
-    #     self.powerParameter = 5					# value based on paper's stated typical value
-    #     self.deletionThreshold = 20
-    #     self.deletionFitnessScale = 0.1
-    #     self.featurePrecision = 0.00000000001	#
-    #
-    #     # Parameters for GA
-    #     self.GAThreshold = 25				   	# average iterations between GA applications
-    #     self.probabilityCrossover = 0.55
-    #     self.probabilityAlleleMutation = 0.02
-    #     self.probabilityWildcardMutation = 0.1
-    #     self.mutationScale = 0.1
-    #
-    #     # Subsumption paramerers
-    #     self.GASubsumption = True
-    #     self.correctSetSubsumption = True
-    #     self.subsumeExpThreshold = 20
-    #     self.subsumeAccuracyThreshold = 0.9
-    #     # Note on subsumeAccuracyThreshold:
-    #     # XCS required prediction error (related to accuracy) to be below a certain threshold. In this
-    #     # implementation (supervised learning) we do not have prediction accuracy. Hence, correct set
-    #     # accuracy is used instead. Standard values for this parameter could only be found for reinforcement
-    #     # learning cases. The starting value of 0.9 was chosen based on the standard values in the
-    #     # literature being 10% of the maximum reward in the reinforcement learning. Hence, 90% accuracy
-    #     # was chosen as the threshold.
 
     def doMatching(self, instance):
         self.matchSet = []
@@ -147,7 +110,7 @@ class LCS:
             classifier.accuracy = classifier.correctCount / classifier.matchCount
             classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
             classifier.matchCount)
-            classifier.fitness = pow(classifier.accuracy,self.powerParameter)
+            classifier.fitness = pow(classifier.accuracy, self.powerParameter)
 
         for classifier in self.matchSet:
             classifier.matchCount += 1
@@ -302,7 +265,7 @@ class LCS:
                 self.correctSet.append(child2)
 
     # getAverageTimePeriod()
-    calculate and return the average time periiod since the last GA for the correctSet
+    #calculate and return the average time period since the last GA for the correctSet
     def getAverageTimePeriod(self):
         """"
         :return avgTs average time period since last GA for the whole correctSet
@@ -314,7 +277,7 @@ class LCS:
             numerositySum += classifier.numerosity
     
         avgTs = ts/numerositySum
-        print("Average Time Period: "+str(avgTs))
+        #print("Average Time Period: "+str(avgTs))
         return avgTs
 
     # updateLastGAIterations
@@ -524,7 +487,8 @@ class LCS:
         for i in range(0, len(subsumer.rules.centres)):
             # If the subsumee has a wildcard that the subsumer does not, return False
             if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
-                return False
+                continue
+                #return False
             # If neither has a wildcard, check upper and lower bounds
             elif subsumer.rules.getLowerBound(i, self.subsumptionTolerance) > subsumee.rules.getLowerBound(i, 0) or \
                  subsumer.rules.getUpperBound(i, self.subsumptionTolerance) < subsumee.rules.getUpperBound(i, 0) :
