@@ -62,13 +62,13 @@ def explore():
 
 def main(loadPop):
     log = logModule.Log('testing_result_9.txt', 'error_9.txt')
-    env = environment.Environment('./features/data_std_training.txt')
-    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    env = environment.Environment('./features/data_MeanVar_training.txt')
+    parameterList = [10000, 1000, 0.3, 0.6, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('./features/data_std_testing.txt', parameterList , log)
+    [a, b] = test('./features/data_MeanVar_testing.txt', parameterList , log)
     log.logTestResult(a, b, parameterList)
 
 
