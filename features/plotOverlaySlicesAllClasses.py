@@ -34,14 +34,22 @@ for filename in os.listdir('./pickles'):
 		plt.clf()
 
 		if(classes[outcome] < 10):
+			aves = []
+
+			for feature in range(40):
+				featureSlices = data[:, feature]
+				aves.append(np.mean(featureSlices))
+
+			ave = np.mean(aves)
+
 			plt.title('File: ' + nameId + '->' + outcome)
 			plt.gca().set_ylim(-11,0)
 			plt.xlabel('Mel Band Feature Number')
 			plt.ylabel('Log Magnitude')
 
 			for i in range(np.shape(data)[1]):
-				plt.plot(data[i,:])
-			plt.savefig('plots/'+outcome+str(graphNum)+'.png')
+				plt.plot(data[i,:]-ave)
+			plt.savefig('newPlots/'+outcome+str(graphNum)+'.png')
 			classes[outcome] += 1
 		# count += 1
 	# if all classifications have 10 then break
