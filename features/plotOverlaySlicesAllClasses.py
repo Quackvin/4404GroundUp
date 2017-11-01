@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 
 # run this script with no arguments in the folder with all the cpickle files.
 # will create a file called data.txt if it doesn't exist already, otherwise will overwrite it
-targetOutcome = 'office'
-outputFile = 'data_' + targetOutcome + '.txt'
-
 files = {}
+classes = {}
 with open('meta.txt','r') as metaFile:
 	for line in metaFile:
 		line = line.split('\t')[0:2]
@@ -17,9 +15,9 @@ with open('meta.txt','r') as metaFile:
 		clss = line[1]
 		clss = re.sub(r'/', '_', clss)
 		files[name] = clss
+		classes[clss] = 0
 
-allFeats = ''
-count = 0
+# count = 0
 for filename in os.listdir('./pickles'):
 	if filename.endswith('.cpickle'):
 		# get file name
@@ -30,21 +28,27 @@ for filename in os.listdir('./pickles'):
 
 		data = np.array(data['feat'][0])
 
-		instanceFeatures = ''
+		outcome = files[nameId]
+		graphNum = classes[outcome]
 
+		plt.clf()
 
-		for i in range(np.shape(data)[1]):
-			plt.plot(data[i,:])
-			# print(np.shape(np.fft.rfft(data[:,i])))
-		# plt.plot(data[0,:])
-		plt.show()
-		count += 1
-	if count>20:
+		if(classes[outcome] < 10):
+			plt.title('File: ' + nameId + '->' + outcome)
+			plt.xlabel('Mel Band Feature Number')
+			plt.ylabel('Log Magnitude')
+
+			for i in range(np.shape(data)[1]):
+				plt.plot(data[i,:])
+			plt.savefig('plots/'+outcome+str(graphNum)+'.png')
+			classes[outcome] += 1
+		# count += 1
+	# if all classifications have 10 then break
+	numKeys = len(classes.keys())
+	print('pre ' + str(numKeys))
+	for key in classes.keys():
+		if classes[key] > 10:
+			numKeys -= 1
+	print('post ' + str(numKeys))
+	if numKeys == 0:
 		break
-
-		# print(instanceFeatures)
-	allFeats += instanceFeatures
-print(allFeats)
-
-# with open(outputFile, 'w') as saveFile:
-# 	saveFile.write(allFeats)
