@@ -33,13 +33,13 @@ class Classifier:
     # set the fitness of this classifier. used when new children are generated from crossing over parents. the new children will have their
     # fitness set as the average of the parents. Because fitness is calculated using correctCount/matchCount , therefore
     # the matchCount and correctCount need to be set as well.
-    def setFitness(self, p1 , p2 ):
+    def setFitness(self, p1 , p2):
         """"
         :p1 first parent
         :p2 second parrent
         """
         self.matchCount = (p1.matchCount + p2.matchCount)/2
-        self.correctCount = (p2.correctCount + p2.correctCount)/2
+        self.correctCount = (p1.correctCount + p2.correctCount)/2
 
 
 class Rules:

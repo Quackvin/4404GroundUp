@@ -139,7 +139,7 @@ def run(lcs, env):
             lcs.updateParameters(matchSetSize)
             
             # GA
-            if len(lcs.correctSet) > 2 and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
+            if len(lcs.correctSet) > 2 and (lcs.getAverageTimePeriod() > lcs.GAThreshold) :
                 print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run')
                 lcs.GA(instance.features)  # includes GA subsumption
             else:
