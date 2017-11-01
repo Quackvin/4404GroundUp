@@ -25,14 +25,14 @@ def graphClassifier(doSave, saveName, strIn):
 	stdRs = [0 if i == '#' else i for i in stdRs]
 
 	plt.title(clsfr['outcome'] + ' Classifier Means')
-	plt.errorbar(x,means, yerr=meanRs, fmt='o')
+	plt.errorbar(x,means, yerr=meanRs, fmt='o', capsize=2)
 	plt.show()
 	if(doSave):
 		plt.savefig(saveName + 'Means.png')
 
 	plt.clf()
 	plt.title(clsfr['outcome'] + ' Classifier Stds')
-	plt.errorbar(x,stds, yerr=stdRs, fmt='o')
+	plt.errorbar(x,stds, yerr=stdRs, fmt='o', capsize=2)
 	plt.show()
 	if(doSave):
 		plt.savefig(saveName + 'Stds.png')
