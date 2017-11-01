@@ -61,8 +61,8 @@ def explore():
 
 
 def main(loadPop):
-    testfile = './features/data_office_car_city_metro_testing.txt'
-    trainingfile = './features/data_office_car_city_metro_training.txt'
+    testfile = './features/data_office_car_only_testing.txt'
+    trainingfile = './features/data_office_car_only_training.txt'
 
     log_result_file = testfile.split('/')[-1].split('.')[0] + '_result.txt'
     log_error_file  = testfile.split('/')[-1].split('.')[0] + '_error.txt'
@@ -71,7 +71,7 @@ def main(loadPop):
 
     env = environment.Environment(trainingfile , testfile)
 
-    parameterList = [10000, 1000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    parameterList = [500, 100, 0.3, 0.4, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
@@ -82,10 +82,10 @@ def main(loadPop):
     #log.logTestResult(a, b, parameterList)
 
 
-def test(testfile, parameterList , log):
+def test(testfile, parameterList , log , saveName):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
-    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
+    loadPopulation(lcs, saveName)
     env = environment.Environment(testfile , '')
     correctCount = 0
     numberOfInstance = 0
@@ -136,11 +136,11 @@ def run(lcs, env ):
         for instance in env.instances:
 
             lcs.currIter += 1
-            if lcs.currIter % 1000 == 0:
-                 saveName = 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+            if lcs.currIter % (lcs.maxNumberOfIteration/10) == 0:
+                 saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
                  savePopulation(lcs.population, saveName)
-                 [a, b] = test( env.testing_file, lcs.parameterList, lcs.log)
-                 lcs.log.logMessage('------------Testing at ' + str(lcs.currIter) + '\n')
+                 [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
+                 lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
                  lcs.log.logTestResult(a, b, lcs.parameterList)
                  lcs.population = []
                  loadPopulation(lcs,saveName)
