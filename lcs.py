@@ -1,5 +1,5 @@
 import classifier as classifierModule
-import random, copy
+import random, copy, math
 
 class LCS:
     # '#' indicates wildcard
@@ -24,6 +24,7 @@ class LCS:
         self.powerParameter =               parameterList[4]  # value based on paper's stated typical value
         self.deletionThreshold =            parameterList[5]
         self.deletionFitnessScale =         parameterList[6]
+        self.deletionScale =                2
         self.featurePrecision =             0.00000000001  #
 
         # Parameters for GA
@@ -146,15 +147,21 @@ class LCS:
             voteSum = voteSum + self.deletionVote(self.population[i], popAveFitness)
             if voteSum >= choicePoint:
                 if self.population[i].numerosity > 1:
+                    # print('Deleting Classifier With Fitness:')
+                    # print(str(self.population[i].fitness) + '\nAccuracy:')
+                    # print(str(self.population[i].accuracy))
                     self.population[i].numerosity -= 1
                 else:
+                    # print('Deleting Classifier With Fitness:')
+                    # print('\t' + str(self.population[i].fitness) + '\nAccuracy:')
+                    # print('\t' + str(self.population[i].accuracy))
                     self.population.pop(i)
                 break
 
+    #make sure testing is deleting unfit classifiers
     def deletionVote(self, classifier, popAveFitness):
         vote = classifier.aveMatchSetSize * classifier.numerosity
-
-        if classifier.matchCount > self.deletionThreshold \
+        if classifier.matchCount > self.deletionThreshold*self.scaleDeletionThreshold(self.currIter-classifier.birthIteration) \
             and classifier.fitness/classifier.numerosity < self.deletionFitnessScale * popAveFitness:
             if classifier.fitness == 0:
                 # to fix divide by 0 error
@@ -191,6 +198,10 @@ class LCS:
             # print(classDict)
             return keys[value.index(max(value))]
     #	 used for testing
+
+    def scaleDeletionThreshold(self, age):
+        ageThresh = 200
+        return (math.pi/2 - math.atan((age-ageThresh)/20))/3.05
 
 
 #########################################################################

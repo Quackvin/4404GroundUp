@@ -12,6 +12,7 @@ with open('meta.txt','r') as metaFile:
 		line = line.split('\t')[0:2]
 		name = re.search(r'/(.+)\.',line[0]).group()[1:-1]
 		clss = line[1]
+		clss = re.sub(r'/', '_', clss)
 		files[name] = clss
 
 allFeats = ''
