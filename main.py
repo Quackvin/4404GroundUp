@@ -1,8 +1,8 @@
 import lcs as lcsModule
 import classifier as classifierModule
-import environment
-import json
+import environment, json
 import log as logModule
+import numpy as np
 
 def explore2():
     parameterLists = [
@@ -59,16 +59,37 @@ def explore():
                                     log.logTestResult(x,y,parameterList)
 
 
+def explore3(loadPop):
+    basePara = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    paralists = []
+
+    for i in np.arange(0.0, 4.5, 0.5):
+        for j in np.arange(0.0, 0.25, 0.5):
+            tmpPara = basePara.copy()
+            tmpPara[2] -= j
+            tmpPara[3] -= i
+            print(tmpPara)
+
+    print(paralists)
+    for parameterList in paralists:
+        log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
+        env = environment.Environment('./features/data_meanVar_training.txt')
+        lcs = lcsModule.LCS(parameterList, log)
+        if loadPop:
+            loadPopulation(lcs)
+        run(lcs, env)
+        [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
+        log.logTestResult(a, b, parameterList)
 
 def main(loadPop):
-    log = logModule.Log('testing_result_9.txt', 'error_9.txt')
-    env = environment.Environment('./features/data_std_training.txt')
+    log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
+    env = environment.Environment('./features/data_meanVar_training.txt')
     parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('./features/data_std_testing.txt', parameterList , log)
+    [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
     log.logTestResult(a, b, parameterList)
 
 
@@ -156,7 +177,7 @@ def run(lcs, env):
             endcondition = lcs.currIter > lcs.maxNumberOfIteration
             '''-------------------------'''
             if endcondition:
-                savePopulation(lcs.population, 'classifierPopulation'+str(lcs.parameterList)+'.json')
+                savePopulation(lcs.population, 'classifierPopulation'+str(lcs.parameterList)+'meanVar.json')
                 print('**********END**********')
                 return 0
 
@@ -193,7 +214,8 @@ def loadPopulation(lcs, saveName):
 
             lcs.population.append(classifier)
 
-main(False)
+explore3(False)
+# main(False)
 # log = logModule.Log('testing_result_8.txt', 'error_8.txt')
 # parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 # test('dataTest.txt' , parameterList , log )
