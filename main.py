@@ -82,22 +82,32 @@ def explore3(loadPop):
         log.logTestResult(a, b, parameterList)
 
 def main(loadPop):
-    log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
-    env = environment.Environment('./features/data_meanVar_training.txt')
-    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    testfile = './features/data_office_car_only_testing.txt'
+    trainingfile = './features/data_office_car_only_training.txt'
+
+    log_result_file = testfile.split('/')[-1].split('.')[0] + '_result.txt'
+    log_error_file  = testfile.split('/')[-1].split('.')[0] + '_error.txt'
+
+    log = logModule.Log(log_result_file ,log_error_file )
+
+    env = environment.Environment(trainingfile , testfile)
+
+    parameterList = [500, 100, 0.3, 0.4, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
-    run(lcs, env)
-    [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
-    log.logTestResult(a, b, parameterList)
+
+    run(lcs, env )
+    #[a, b] = test(testfile, parameterList , log)
+    #log.logTestResult(a, b, parameterList)
 
 
-def test(testfile, parameterList , log):
+def test(testfile, parameterList , log , saveName):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
-    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
-    env = environment.Environment(testfile)
+    loadPopulation(lcs, saveName)
+    env = environment.Environment(testfile , '')
     correctCount = 0
     numberOfInstance = 0
     numberOfUncovered = 0
@@ -140,13 +150,21 @@ def test(testfile, parameterList , log):
     return [result, numberOfUncovered]
 
 
-def run(lcs, env):
+def run(lcs, env ):
     print('**********Training*********')
     while True:
 
         for instance in env.instances:
 
             lcs.currIter += 1
+            if lcs.currIter % (lcs.maxNumberOfIteration/10) == 0:
+                 saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+                 savePopulation(lcs.population, saveName)
+                 [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
+                 lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
+                 lcs.log.logTestResult(a, b, lcs.parameterList)
+                 lcs.population = []
+                 loadPopulation(lcs,saveName)
 
             matchSetSize = lcs.doMatching(instance)
 
@@ -156,7 +174,7 @@ def run(lcs, env):
             lcs.updateParameters(matchSetSize)
             
             # GA
-            if len(lcs.correctSet) > 2 and ( lcs.getAverageTimePeriod() > lcs.GAThreshold) :
+            if len(lcs.correctSet) > 2 and (lcs.getAverageTimePeriod() > lcs.GAThreshold) :
                 print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run')
                 lcs.GA(instance.features)  # includes GA subsumption
             else:
@@ -177,7 +195,7 @@ def run(lcs, env):
             endcondition = lcs.currIter > lcs.maxNumberOfIteration
             '''-------------------------'''
             if endcondition:
-                savePopulation(lcs.population, 'classifierPopulation'+str(lcs.parameterList)+'meanVar.json')
+                savePopulation(lcs.population, 'classifierPopulation'+str(lcs.parameterList)+'.json')
                 print('**********END**********')
                 return 0
 
@@ -214,8 +232,7 @@ def loadPopulation(lcs, saveName):
 
             lcs.population.append(classifier)
 
-explore3(False)
-# main(False)
+main(False)
 # log = logModule.Log('testing_result_8.txt', 'error_8.txt')
 # parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 # test('dataTest.txt' , parameterList , log )
