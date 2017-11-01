@@ -61,19 +61,15 @@ def explore():
 
 
 def main(loadPop):
-    log = logModule.Log('testing_result_7.txt', 'error_7.txt')
-    env = environment.Environment('data_training.txt')
-    parameterList = [15000, 500, 0.15, 0.5, 5, 20, 0.2, 50, 0.75, 0.01, 0.5, 1, 15, 0.9]
+    log = logModule.Log('testing_result_9.txt', 'error_9.txt')
+    env = environment.Environment('./features/data_std_training.txt')
+    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('data_testing.txt', parameterList , log)
+    [a, b] = test('./features/data_std_testing.txt', parameterList , log)
     log.logTestResult(a, b, parameterList)
-    with open('testing_result.txt', 'a') as dataFile_1:
-        dataFile_1.write("--------------------------------------------------------------------------------------------")
-        dataFile_1.write(str(parameterList) + "\n")
-        dataFile_1.write("Accuracy  " + str(a) + "   Uncovered: " + str(b) + "\n")
 
 
 def test(testfile, parameterList , log):
@@ -167,7 +163,7 @@ def run(lcs, env):
 
 def savePopulation(population, saveName):
     print('\nSaving')
-    #with open('classifierPopulation_5.json', 'w') as writeFile:
+    #with open('classifierPopulation_6.json', 'w') as writeFile:
     with open(saveName, 'w') as writeFile:
         for classifier in population:
             classifierDict = classifier.__dict__
@@ -177,7 +173,7 @@ def savePopulation(population, saveName):
 
 
 def loadPopulation(lcs, saveName):
-    # with open('classifierPopulation_5.json', 'r') as readFile:
+    # with open('classifierPopulation_6.json', 'r') as readFile:
     with open(saveName, 'r') as readFile:
         for classifierStr in readFile:
             classifierDict = json.loads(classifierStr)
