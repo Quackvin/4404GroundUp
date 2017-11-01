@@ -61,14 +61,18 @@ def explore():
 
 
 def main(loadPop):
-    log = logModule.Log('testing_result_9.txt', 'error_9.txt')
-    env = environment.Environment('./features/data_MeanVar_training.txt')
-    parameterList = [10000, 1000, 0.3, 0.6, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    testfile = './features/data_office_car_city_metro_testing.txt'
+    trainingfile = './features/data_office_car_city_metro_training.txt'
+
+    log = logModule.Log('testing_result_10.txt', 'error_10.txt')
+    env = environment.Environment(trainingfile )
+    parameterList = [10000, 1000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
-    run(lcs, env)
-    [a, b] = test('./features/data_MeanVar_testing.txt', parameterList , log)
+
+    run(lcs, env , testfile)
+    [a, b] = test('./features/data_office_car_city_metro_testing.txt', parameterList , log)
     log.logTestResult(a, b, parameterList)
 
 
@@ -126,6 +130,14 @@ def run(lcs, env):
         for instance in env.instances:
 
             lcs.currIter += 1
+            if lcs.currIter % 1000 == 0:
+                 saveName = 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+                 savePopulation(lcs.population, saveName)
+                 [a, b] = test('./features/data_office_car_city_metro_testing.txt', lcs.parameterList, lcs.log)
+                 lcs.log.logMessage('------------Testing at ' + str(lcs.currIter) + '\n')
+                 lcs.log.logTestResult(a, b, lcs.parameterList)
+                 lcs.population = []
+                 loadPopulation(lcs,saveName)
 
             matchSetSize = lcs.doMatching(instance)
 
