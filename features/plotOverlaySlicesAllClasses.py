@@ -35,6 +35,7 @@ for filename in os.listdir('./pickles'):
 
 		if(classes[outcome] < 10):
 			plt.title('File: ' + nameId + '->' + outcome)
+			plt.gca().set_ylim(-11,0)
 			plt.xlabel('Mel Band Feature Number')
 			plt.ylabel('Log Magnitude')
 
@@ -45,10 +46,8 @@ for filename in os.listdir('./pickles'):
 		# count += 1
 	# if all classifications have 10 then break
 	numKeys = len(classes.keys())
-	print('pre ' + str(numKeys))
 	for key in classes.keys():
 		if classes[key] > 10:
 			numKeys -= 1
-	print('post ' + str(numKeys))
 	if numKeys == 0:
 		break
