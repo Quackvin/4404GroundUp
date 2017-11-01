@@ -50,12 +50,12 @@ def method1():
 			saveFile.write(line)
 
 # split the data_stds file into testing and training, it is made sure that the number of classes in each file is equally proportional
-def method2():
+def method2(filename):
     print(os.getcwd())
     classDict = {}
-    with open('data_stds.txt', 'r') as ReadFile:
-        with open('data_std_training.txt', 'w') as TrainFile:
-            with open('data_std_testing.txt', 'w') as TestFile:
+    with open(filename, 'r') as ReadFile:
+        with open(filename.split('.')[0]+'_training.txt', 'w') as TrainFile:
+            with open(filename.split('.')[0]+'_testing.txt', 'w') as TestFile:
                 for line in ReadFile:
                     a = line.split('\t')
                     cls = a[-1]
@@ -72,9 +72,9 @@ def method2():
 def method3():
     for filename in os.listdir('./data'):
         if 'car' in filename or 'office' in filename :
-            with open(filename, 'r') as ReadFile:
-                with open('data_office_car_training.txt', 'w') as TrainFile:
-                    with open('', 'w') as TestFile:
+            with open('./data/'+filename, 'r') as ReadFile:
+                with open('data_office_car_training.txt', 'a') as TrainFile:
+                    with open('data_office_car_testing.txt', 'a') as TestFile:
                         j = 0
                         for line in ReadFile:
                             j += 1
@@ -85,11 +85,34 @@ def method3():
                                 TrainFile.write(line)
 
         else:
-            with open(filename, 'r') as ReadFile:
-                with open(filename, 'w') as TrainFile:
-                    with open(filename, 'w') as TestFile:
-                        splitted = line.split('\t')
-                        print(splitted)
+            with open('./data/'+filename, 'r') as ReadFile:
+                with open('data_office_car_training.txt', 'a') as TrainFile:
+                    with open('data_office_car_testing.txt', 'a') as TestFile:
+                        j = 0
+                        for line in ReadFile:
+                            splitted = line.split('\t')
+                            splitted[-1] = 'other\n'
+                            newline = '\t'.join(splitted)
+                            j += 1
+                            if j % 4 == 0:
+                                j = 0
+                                TestFile.write(newline)
+                            else:
+                                TrainFile.write(newline)
+def method4():
+    for filename in os.listdir('./data'):
+        if 'car' in filename or 'office' in filename or 'city_center' in filename or 'forest_path' in filename :
+            with open('./data/'+filename, 'r') as ReadFile:
+                with open('data_office_car_city_forest_training.txt', 'a') as TrainFile:
+                    with open('data_office_car_city_forest_testing.txt', 'a') as TestFile:
+                        j = 0
+                        for line in ReadFile:
+                            j += 1
+                            if j%4 == 0:
+                                j = 0
+                                TestFile.write(line)
+                            else:
+                                TrainFile.write(line)
 
 def method5():
 	# Extract test and training data based on a chosen percentage of training data
@@ -137,3 +160,5 @@ def method5():
 			saveFile.write(line)
 
 method5()
+# method4()
+# method2('data_MeanVar.txt')

@@ -1,11 +1,23 @@
 class Environment:
-    def __init__(self, datafile):
+
+    def __init__(self, datafile , testfile='' ):
         """
 
         :rtype: object
         """
         self.instances = self.parseDatafile(datafile)
         self.classList = self.getAllClasses()
+        self.testing_file = testfile
+
+
+    def __init__(self, datafile , testfile):
+        """
+
+        :rtype: object
+        """
+        self.instances = self.parseDatafile(datafile)
+        self.classList = self.getAllClasses()
+        self.testing_file = testfile
 
     def parseDatafile(self, datafile):
         with open(datafile, 'r') as data:
