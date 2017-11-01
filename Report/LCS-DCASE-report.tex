@@ -20,6 +20,9 @@
 % To-do notes and to-do list
 \usepackage[colorinlistoftodos,prependcaption]{todonotes}
 
+% Width between columns
+\setlength{\columnsep}{0.8cm}
+
 % Tables with centred, fixed with columns
 \usepackage{array}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}		% used in cover page
@@ -54,7 +57,6 @@
 
 
 \begin{document}
-\listoftodos[Things to do]
 
 % Title
 \title{
@@ -80,65 +82,124 @@
 
 \begin{multicols}{2}
 
+
 \section{Introduction}
 
-
-Test citation: \cite{Anderson2016}
 
 \lipsum[1]
 
 
 
 
-\section{Literature Review}
+\section{Background}
 
-
+This section provides a brief review of learning classifier systems (\ref{sec:LCS}), the DCASE Challenge (\ref{sec:DCASE}) and acoustic scene classification (\ref{sec:ASC}).
 
 
 
 \subsection{Learning Classifier Systems}
+\label{sec:LCS}
 
+First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms \cite{Butz2015}. The core of LCSs is the population of rules, or \textit{classifiers}, which collectively form the solution to the given problem \cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and \textit{optimally general} set \cite{Urbanowicz2009}.
+
+The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- or rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem.
+
+Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this condition, perform this action'.
+
+
+, an action and a number of parameters. The condition specifies the subspace of the problem, while the action proposes an outcome for this subspace. For a given \textit{instance} of the problem, the classifiers then say: `If the problem instance matches
+
+
+XCS can be distinguished by the
+following key features: an accuracy based fitness, a niche
+GA (acting in the action set [A]), and an adaptation of
+standard Q-Learning as credit assignment.
+
+
+
+
+evolved using a learning mechanism incorporating a number of mechanisms -- GA, subsumption, deletion and covering
+
+online vs reinforcement (key success area of LCS)
+
+continuous vs discrete data
+
+fitness: strength vs. accuracy
+
+Common variants: MCS, XCS, XCSR
 
 
 
 
 \subsection{DCASE Challenge}
+\label{sec:DCASE}
 
+what (sound recognition, machine listening), why (motivations) and how (mechanics of challenge)
 
-
+baseline solution, best results
 
 
 \subsection{Acoustic Scene Classification}
+\label{sec:ASC}
+
+more detailed description of this particular task from the challenge
+
+
+
+\section{Experiments}
+\label{sec:exp}
+
+blah
+
+\subsection{Modification of Existing Code}
+\label{sec:ryan}
+
+\todo[inline]{Is there a better title you'd suggest Scott?}
+
+Description of Ryan's code, how we modified it and the results obtained
+
+
+
+\subsection{Adapted XCS(R) Design}
+\label{sec:home}
+
+Details of the LCS we made, specific design changes relative to the standard implementation for our problem
 
 
 
 
-
-\section{Experiment}
-
-
-
-- Feature Extraction, motivation for feature choices (i.e. feautres don't vary a lot across a file (low standard deviation), need to reduce the number of features)
-
-- Description of the code (the one we made outselved and Urbaonwicz's)
-
-- Parameters used
-
-
-
+%- Feature Extraction, motivation for feature choices (i.e. feautres don't vary a lot across a file (low standard deviation), need to reduce the number of features)
+%
+%- Description of the code (the one we made outselved and Urbaonwicz's)
+%
+%- Parameters used
+%
+%Structure and design of algorithm: generic XCS modified for continuous data and offline learning
+%
+%Key modifications to basic LCs: (1) added tolerance to subsumption and removed wildcard criteria so that subsumption has some likelihood of occurring, (2) changed deletion criteria so that classifiers with little utility (low match count) can be deleted, motivation was the really low average match count, (3) action set subsumption criteria for most general classifier determined as most wildcards or equal most and largest range, (4) ...
+%
+%Show graph of function for deletion experience threshold (developed in response to \#2)
 
 
 
 
-\section{Retults}
+\section{Results}
 
 
-- Rate of learning (improvement in accuracy over time)
+\subsection{Environment Representations}
 
-- Overall results: pairwise, all classes at once (confusion matrices)
+Alternative feature processing investigated
 
 
 
+\subsection{Parameter Tuning}
+
+%- Rate of learning (improvement in accuracy over time)
+%
+%- Overall results: pairwise, all classes at once (confusion matrices)
+%
+%
+%Theoretical analysis?
 
 
 
