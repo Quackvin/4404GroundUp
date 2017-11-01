@@ -57,6 +57,8 @@ for key in cats:
 
 plt.legend()
 plt.show()
+name = ''.join([i[:3] for i in cats]) + 'plotMeans.png'
+plt.savefig(name)
 
 
 plt.clf()
@@ -67,3 +69,5 @@ for key in cats:
 
 plt.legend()
 plt.show()
+name = ''.join([i[:3] for i in cats]) + 'plotStds.png'
+plt.savefig(name)
