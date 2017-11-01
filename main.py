@@ -166,7 +166,7 @@ def savePopulation(population, saveName):
     #with open('classifierPopulation_6.json', 'w') as writeFile:
     with open(saveName, 'w') as writeFile:
         for classifier in population:
-            classifierDict = classifier.__dict__
+            classifierDict = classifier.__dict__.copy()
             classifierDict['rules'] = classifierDict['rules'].__dict__
             classifierString = json.dumps(classifierDict) + '\n'
             writeFile.write(classifierString)
