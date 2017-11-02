@@ -76,7 +76,7 @@
 
 % Abstract
 \begin{abstract}
-	This will be our abstract \\
+	This will be our abstract \\	
 	\lipsum[2]
 \end{abstract}
 
@@ -102,37 +102,24 @@ This section provides a brief review of learning classifier systems (\ref{sec:LC
 
 First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms \cite{Butz2015}. The core of LCSs is the population of rules, or \textit{classifiers}, which collectively form the solution to the given problem \cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and \textit{optimally general} set \cite{Urbanowicz2009}.
 
-The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- or rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem.
+The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- or rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem. Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this condition, perform this action'. Classifier fitness is evaluated based on feedback from the problem (also known as the environment).
 
-Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this condition, perform this action'.
+The learning process of a LCS includes a rule discovery method known as covering, a generalisation-pressure effect called subsumption, a generic algorithm (GA), fitness-based deletion to maintain a finite-sized population and, in some cases, reinforcement learning \cite{Butz2000}.
 
+The rule discovery method, covering, is used to initialise the population by adding a new classifier whenever a problem instance matches no existing classifier. Subsumption is used to eliminate classifiers with more specific conditions that are no more accurate than others with equivalent, but more general conditions. The GA is used as a secondary rule discovery method that only operates on high performing rules. Deletion is employed to maintain a finite population size by removing poorly performing classifiers. Reinforcement learning may be used as a final step in the learning cycle for problems where feedback from the environment is delayed.
 
-, an action and a number of parameters. The condition specifies the subspace of the problem, while the action proposes an outcome for this subspace. For a given \textit{instance} of the problem, the classifiers then say: `If the problem instance matches
+A seminal work in the field of LCSs was the introduction of the eXtended Classifier System by Wilson \cite{Lanzi2008,Sigaud2007}. This incorporated a number of features which substantially improved the performance of the LCS \cite{Lanzi2008}.
 
-
-XCS can be distinguished by the
-following key features: an accuracy based fitness, a niche
-GA (acting in the action set [A]), and an adaptation of
-standard Q-Learning as credit assignment.
-
-
-
-
-evolved using a learning mechanism incorporating a number of mechanisms -- GA, subsumption, deletion and covering
-
-online vs reinforcement (key success area of LCS)
-
-continuous vs discrete data
-
-fitness: strength vs. accuracy
-
-Common variants: MCS, XCS, XCSR
-
+A key distinction amongst LCS applications is between supervised learning, in which feedback from the environment is delayed (such as robot navigation), and offline learning, where feedback is immediate and the correct action known in advance (such as classification tasks). This distinction determines whether reinforcement learning is necessary and affects how classifier accuracy is calculated.
 
 
 
 \subsection{DCASE Challenge}
 \label{sec:DCASE}
+
+Sound classification, or machine listening, is seen as a promising research field with multifarious applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space by providing standardised 
+
+
 
 what (sound recognition, machine listening), why (motivations) and how (mechanics of challenge)
 
@@ -160,11 +147,19 @@ Description of Ryan's code, how we modified it and the results obtained
 
 
 
+
+
 \subsection{Adapted XCS(R) Design}
 \label{sec:home}
 
 Details of the LCS we made, specific design changes relative to the standard implementation for our problem
 
+
+\[
+\frac{\textrm{deletionThreshold}}{3.05}
+\left(
+\pi/2-\arctan\left(\frac{\textrm{age} - \textrm{ageThreshold}}{20} \right) \right)
+\]
 
 
 
@@ -203,6 +198,8 @@ Alternative feature processing investigated
 
 
 
+Reason why standard deviation and mean are used, what information they carry
+
 
 
 
@@ -211,6 +208,12 @@ Alternative feature processing investigated
 
 
 
+Car and office confusion matrix
+Plot for std dev and mean (for car and office) to explain
+Car, office and city centre (with confusion and plots)
+Then add metro station and show results (worse) - explain why it is worse
+Show a classifier on a graph to show how it can match instances
+Overall accuracy (all 15 features)
 
 
 
