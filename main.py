@@ -1,8 +1,8 @@
 import lcs as lcsModule
 import classifier as classifierModule
-import environment
-import json
+import environment, json
 import log as logModule
+import numpy as np
 
 def explore2():
     parameterLists = [
@@ -59,24 +59,55 @@ def explore():
                                     log.logTestResult(x,y,parameterList)
 
 
+def explore3(loadPop):
+    basePara = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    paralists = []
+
+    for i in np.arange(0.0, 4.5, 0.5):
+        for j in np.arange(0.0, 0.25, 0.5):
+            tmpPara = basePara.copy()
+            tmpPara[2] -= j
+            tmpPara[3] -= i
+            print(tmpPara)
+
+    print(paralists)
+    for parameterList in paralists:
+        log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
+        env = environment.Environment('./features/data_meanVar_training.txt')
+        lcs = lcsModule.LCS(parameterList, log)
+        if loadPop:
+            loadPopulation(lcs)
+        run(lcs, env)
+        [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
+        log.logTestResult(a, b, parameterList)
 
 def main(loadPop):
-    log = logModule.Log('testing_result_9.txt', 'error_9.txt')
-    env = environment.Environment('./features/data_std_training.txt')
-    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    testfile = './features/data_office_car_only_testing.txt'
+    trainingfile = './features/data_office_car_only_training.txt'
+
+    log_result_file = testfile.split('/')[-1].split('.')[0] + '_result.txt'
+    log_error_file  = testfile.split('/')[-1].split('.')[0] + '_error.txt'
+
+    log = logModule.Log(log_result_file ,log_error_file )
+
+    env = environment.Environment(trainingfile , testfile)
+
+    parameterList = [500, 100, 0.3, 0.4, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
-    run(lcs, env)
-    [a, b] = test('./features/data_std_testing.txt', parameterList , log)
-    log.logTestResult(a, b, parameterList)
+
+    run(lcs, env )
+    #[a, b] = test(testfile, parameterList , log)
+    #log.logTestResult(a, b, parameterList)
 
 
-def test(testfile, parameterList , log):
+def test(testfile, parameterList , log , saveName):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
-    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
-    env = environment.Environment(testfile)
+    loadPopulation(lcs, saveName)
+    env = environment.Environment(testfile , '')
     correctCount = 0
     numberOfInstance = 0
     numberOfUncovered = 0
@@ -119,13 +150,21 @@ def test(testfile, parameterList , log):
     return [result, numberOfUncovered]
 
 
-def run(lcs, env):
+def run(lcs, env ):
     print('**********Training*********')
     while True:
 
         for instance in env.instances:
 
             lcs.currIter += 1
+            if lcs.currIter % (lcs.maxNumberOfIteration/10) == 0:
+                 saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+                 savePopulation(lcs.population, saveName)
+                 [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
+                 lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
+                 lcs.log.logTestResult(a, b, lcs.parameterList)
+                 lcs.population = []
+                 loadPopulation(lcs,saveName)
 
             matchSetSize = lcs.doMatching(instance)
 
