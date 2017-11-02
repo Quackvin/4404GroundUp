@@ -60,44 +60,44 @@ def explore():
 
 
 def explore3(loadPop):
-    basePara = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    basePara = [5000, 1000, 0.3, 0.6, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     paralists = []
 
-    for i in np.arange(0.0, 4.5, 0.5):
-        for j in np.arange(0.0, 0.25, 0.5):
+    for j in np.arange(0.0, 0.4, 0.1):
+        for i in np.arange(1.0, 5.5, 1.5):
             tmpPara = basePara.copy()
             tmpPara[2] -= j
-            tmpPara[3] -= i
-            print(tmpPara)
+            tmpPara[3] += i
+            paralists.append(tmpPara)
 
     print(paralists)
     for parameterList in paralists:
-        log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
-        env = environment.Environment('./features/data_meanVar_training.txt')
+        log = logModule.Log('./testing_result_MeanVar.txt', 'error_MeanVar.txt')
+        env = environment.Environment('features/data_MeanVar_training.txt', '')
         lcs = lcsModule.LCS(parameterList, log)
         if loadPop:
             loadPopulation(lcs)
         run(lcs, env)
-        [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
+        [a, b] = test('./features/data_MeanVar_testing.txt', parameterList , log)
         log.logTestResult(a, b, parameterList)
 
 def main(loadPop):
-    log = logModule.Log('testing_result_MeanVar.txt', 'error_MeanVar.txt')
-    env = environment.Environment('./features/data_meanVar_training.txt')
-    parameterList = [10000, 2000, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    log = logModule.Log('./testing_result_MeanVar1.txt', 'error_MeanVar.txt')
+    env = environment.Environment('features/data_training.txt', '')
+    parameterList = [5000, 100, 0.3, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
         loadPopulation(lcs)
     run(lcs, env)
-    [a, b] = test('./features/data_meanVar_testing.txt', parameterList , log)
+    [a, b] = test('./features/data_testing.txt', parameterList , log)
     log.logTestResult(a, b, parameterList)
 
 
 def test(testfile, parameterList , log):
     print('**********Testing Start*********')
     lcs = lcsModule.LCS(parameterList, log)
-    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'.json' )
-    env = environment.Environment(testfile)
+    loadPopulation(lcs,'classifierPopulation'+str(lcs.parameterList)+'meanVar.json' )
+    env = environment.Environment(testfile, '')
     correctCount = 0
     numberOfInstance = 0
     numberOfUncovered = 0
@@ -214,9 +214,8 @@ def loadPopulation(lcs, saveName):
 
             lcs.population.append(classifier)
 
-explore3(False)
 # main(False)
 # log = logModule.Log('testing_result_8.txt', 'error_8.txt')
 # parameterList = [5000, 1000, 0.15, 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 # test('dataTest.txt' , parameterList , log )
-# explore2()
+explore3(False)
