@@ -83,9 +83,7 @@
 
 
 \section{Introduction}
-
-
-\todo[inline]{Write introduction}
+Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so to take a new approach, Learning Classifier Systems (LCSs) were explored as an alternative means of training a classification model. LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing, an instance is classified based on a vote from the population. Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system’s feature extraction tool, with the first experimenting with a prebuilt LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs’ parameters and to determine the how well these systems are able to classify scenes based on acoustic features.
 
 
 
