@@ -84,7 +84,11 @@
 
 \section{Introduction}
 
-Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so to take a new approach, Learning Classifier Systems (LCSs) were explored as an alternative means of training a classification model. LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing, an instance is classified based on a vote from the population. Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system’s feature extraction tool, with the first experimenting with a prebuilt LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs’ parameters and to determine the how well these systems are able to classify scenes based on acoustic features.
+Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so taking a new approach, Learning Classifier Systems (LCSs) was explored as an alternative means of training a classification model.
+
+LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing; an instance is classified based on a vote from the population.
+
+Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system's feature extraction tool, with the first experimenting with a pre-built LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs' parameters and determine the how well these systems are able to classify scenes based on acoustic features.
 
 
 
@@ -498,7 +502,7 @@ Where $exp_{min}$ is the initial minimum experience threshold (that will apply t
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/deletionThreshold.png}
+	\includegraphics[width=0.65\linewidth]{figures/deletionThreshold.png}
 	\caption{Variable deletion threshold with cut-off age depicted as dashed vertical red line}
 	\label{fig:deletionthreshold}
 \end{figure}
@@ -526,24 +530,24 @@ Overall Maximum Number Of Iteration,Maximum Population Size and Initial Range Fa
 \subsection{Subsets of Classifications}
 \label{sec:subsets}
 
-First, the simplest case of classifying between only two classes of sound files was attempted. As shown in Figure~\todo{add ref}, the overall accuracy of the LCS system converged on around 97\% after 3,000 iterations. And as shown in the confusion matrix table, 97.4\% of testing instance belonging to car and office was correctly classified. The LCS was not able to make a decision for approximately 2\% of the testing instances.
+First, the simplest case of classifying between only two classes of sound files was attempted. As shown in Figure~\ref{fig:twoClass}, the overall accuracy of the LCS system converged on around 97\% after 3,000 iterations. And as shown in the confusion matrix table, 97.4\% of testing instance belonging to car and office was correctly classified. The LCS was not able to make a decision for approximately 2\% of the testing instances.
 
-ONE FIGURE AND CONFUSION MATRIX
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.6\linewidth]{yiyang_figures/1.png}
+	\caption{Accuracy with two classes over 5,000 iterations}
+	\label{fig:twoClass}
+\end{figure}
 
 \begin{table}[!htbp]
 	\centering
 	\caption{Two class confusion matrix}
 	\label{tab:conf2}
-	\begin{tabularx}{0.3\textwidth}{cc}
+	\begin{tabularx}{0.43\textwidth}{lccc}
 		\toprule
-		\textbf{Quantity} & \textbf{Probability} \\ \midrule
-		0         &         0.04         \\
-		1         &         0.13         \\
-		2         &         0.21         \\
-		3         &         0.24         \\
-		4         &         0.18         \\
-		5         &         0.11         \\
-		$\ge$ 6      &         0.10         \\ \bottomrule
+		                & \textbf{Car} & \textbf{Office} & \textbf{Uncovered} \\ \midrule
+		 \textbf{Car}   &     97.4     & 1.3             & 1.3                \\
+		\textbf{Office} &      0       & 97.4            & 2.6                \\ \bottomrule
 	\end{tabularx}
 \end{table}
 
@@ -553,20 +557,56 @@ Next the above experiment was extended by the addition the city centre data. The
 
 It can be observed that the system has the best performance on classifying office, where 100\% of the testing instances were correctly classified. The accuracy of classification on car has been reduced down to 88.5\% from around 97\% in the previous test. 
 
-ONE FIGURE AND CONFUSION MATRIX
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\linewidth]{yiyang_figures/2.png}
+	\caption{Accuracy with three classes over 10,000 iterations}
+	\label{fig:threeClass}
+\end{figure}
+
+\begin{table}[!htbp]
+	\centering
+	\caption{Three class confusion matrix}
+	\label{tab:conf3}
+	\begin{tabularx}{0.68\textwidth}{lcccc}
+		\toprule
+		                     & \textbf{Car} & \textbf{Office} & \textbf{City Centre} & \textbf{Uncovered} \\ \midrule
+		    \textbf{Car}     &     88.5     & 5.1             & 5.1                  & 1.3                \\
+		  \textbf{Office}    &      0       & 100             & 0                    & 0                  \\
+		\textbf{City Centre} &     2.7      & 2.7             & 93.4                 & 1.3                \\ \bottomrule
+	\end{tabularx}
+\end{table}
 
 
 
 
-FOUR
+
 
 The system converged on a much lower accuracy (80\%) when data from four classes were used. A noteworthy observation is that the introduction of an additional class has little impact to the classes beforehand, yet as it can been seen in the confusion matrix, 34.2\% of testing instance belonging to metro station was falsely classified as city centre.
 
-ONE FIGURE AND CONFUSION MATRIX
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.6\linewidth]{yiyang_figures/3.png}
+	\caption{Accuracy with four classes over 10,000 iterations}
+	\label{fig:fourClass}
+\end{figure}
+
+\begin{table}[!htbp]
+	\centering
+	\caption{Four class confusion matrix}
+	\label{tab:conf4}
+	\begin{tabularx}{0.9\textwidth}{lccccc}
+		\toprule
+		                       & \textbf{Car} & \textbf{Office} & \textbf{City Centre} & \textbf{Metro Station} & \textbf{Uncovered} \\ \midrule
+		\textbf{Car}           &     91.0     &       3.8       &          0           & 3.8                    &        1.3         \\
+		\textbf{Office}        &      0       &      96.1       &          0           & 1.3                    &         0          \\
+		\textbf{City Centre}   &      0       &       2.7       &         88.5         & 7.7                    &        1.3         \\ \bottomrule
+		\textbf{Metro Station} &     3.8      &       5.1       &         34.1         & 50.0                   &        6.4 \\ \bottomrule
+	\end{tabularx}
+\end{table}
 
 
 
-ALL
 
 As shown in the previous three tests, as the number of classes in the testing data increases, the overall accuracy of the LCS system decreases. This is as expected as the introduction of more classes will inevitably introduce many noise to the classifiers as well.  When all the classes in the testing dataset were used, it was observed that the overall accuracy decreased to around 44\%. 
 
@@ -575,39 +615,95 @@ As shown in the previous three tests, as the number of classes in the testing da
 
 \section{Discussion}
 
-
 The LCS system demonstrated good classification accuracy when data of three classes are used. However, when class ``metro station'' is introduced, the accuracy was brought down to around 80\%. This could be interpreted by looking at the characteristic curve for different classes.
 
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/Figure_1.png}
+		\caption{Means}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/3_class_std.png}
+		\caption{Standard deviations}
+	\end{subfigure}
+	\caption{Average and standard deviation of sound file averaged mel bands across all sound files for three classes}
+	\label{fig:avgAndStd3}
+\end{figure}
 
-Figure 1 is the average standard deviations for each mel band (attribute) across all instances in the dataset for class ``car'',''office'' and ``city centre'', while figure 2 is the average means for each mel band(attribute) across all instances for the same classes.  These two graphs represents the general trend of all instances belonging to those classes in the dataset.  As it can be observed, those three lines  in each of the figure are relatively distinct from each other, meaning that it is relatively easy for the LCS system to generate rules that can distinguish them from each other. 
+Figure~\ref{fig:avgAndStd3}(a) is the average standard deviations for each mel band (attribute) across all instances in the dataset for class ``car'',''office'' and ``city centre'', while Figure~\ref{fig:avgAndStd3}(b) is the average means for each mel band (attribute) across all instances for the same classes.  These two graphs represents the general trend of all instances belonging to those classes in the dataset.  As it can be observed, those three lines  in each of the figure are relatively distinct from each other, meaning that it is relatively easy for the LCS system to generate rules that can distinguish them from each other. 
 
-However, when class ``metro station'' are added in the dataset, as reflected in figures above, the lines are not as distinct as before. The curve of city centre and metro station follow a really similar trend, meaning that if the range covered by one classifier could potentially cover the curve for the other class as well. Therefore, it is not surprising that metro station has a 35\% chance of being falsely classified as city centre. 
+However, when class ``metro station'' are added in the dataset, as reflected in Figure~\ref{fig:avgAndStd4} where the lines are not as distinct as before. The curve of city centre and metro station follow a similar trend, meaning that if the range covered by one classifier could potentially cover the curve for the other class as well. Therefore, it is unsurprising that metro station has a 35\% chance of being falsely classified as city centre.
 
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/avg_4_classes.png}
+		\caption{Means}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/std_4_classes.png}
+		\caption{Standard deviations}
+	\end{subfigure}
+	\caption{Average and standard deviation of sound file averaged mel bands across four classes of sound files}
+	\label{fig:avgAndStdAll}
+\end{figure}
 
-
-
-The figures above showcase the characteristics curve for all 16 classes. It is clear that the curve for many classes are clustered together, meaning that the classifiers in the LCS system have a very high chance of grouping the curve belonging to several classes into one set of rules. Thus the low accuracy of classifying 16 classes can be understood. 
+Figure~\ref{fig:avgAndStdAll} showcases the characteristics curve for all 16 classes. It is clear that the curve for many classes are clustered together, meaning that the classifiers in the LCS system have a very high chance of grouping the curve belonging to several classes into one set of rules. Thus the low accuracy of classifying 16 classes can be understood. 
 
 In general, the reduction of features means that a large proportion of information is thrown away. Given the fact that there are 80 attributes in a instance and each of them are continuous, the amount of training data (around 4,000) is insufficient for LCS to generate accurate rules to classify classes that has their characteristic curves clustered together as shown in the figures above. 
 
 
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/avg_all_classes.png}
+		\caption{Means}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{yiyang_figures/stds_all_classes.png}
+		\caption{Standard deviations}
+	\end{subfigure}
+	\caption{Average and standard deviation of sound file averaged mel bands across all instances of all classes}
+	\label{fig:avgAndStd4}
+\end{figure}
 
 
 
-
+\pagebreak
 \section{Future Research}
 
 As previously discussed, quality of the results achieved by a machine learning system is highly dependent on the quality of the features used as input. While reducing the dimension of the data by taking the mean and standard deviation of the mel bands worked well for classification of a few different scenes, the classifier performed poorly when presented with more categories to discriminate. This behaviour indicates that the features used did not adequately capture the nuances separating different scenes and that representing the data in different ways may be beneficial to performance.
+
 It may be useful to do Fourier analysis in order to better represent the shape of a sound file's magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn't increase dimensionality too drastically. 
-The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems. 
+
+The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems.
+ 
 Smoothness of the different magnitude-mel band curves would be an interesting feature to look into using for future experiments. Features could potentially be derived from the location of maxima and minima as well as the smoothness between adjacent mel bands.
-There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in 
-\todo[inline]{flipItBoyo.png}
+
+There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in Figure~\ref{fig:flipItBoyo}.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=\textwidth]{figures/flipItBoyo.png}
+	\caption{Each mel band shown over time for three sound files from three classes}
+	\label{fig:flipItBoyo}
+\end{figure}
+
 Given time for further research, investigation into classification using the high dimensional data directly extracted using the DCASE Baseline system's feature extractor also has potential to yield better results. Retaining all of the time data would make classifiers in the LCS more prone to overfitting an instance, but increasing generality with a higher proportion of wildcards may be able to offset this while also allowing useful information to be exploited rather than lost. This would also require a larger training dataset in order to be properly tested, as more data points would be needed to describe the higher dimensional space.
 
+
+
+\pagebreak
 \section{Conclusion}
 
-Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into useable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
+Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into usable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
 
 
 
