@@ -351,6 +351,13 @@ Our approach is good because it is more general (no need to construct statistica
 
 
 
+\section{Future Research}
+As previously discussed, quality of the results achieved by a machine learning system is highly dependent on the quality of the features used as input. While reducing the dimension of the data by taking the mean and standard deviation of the mel bands worked well for classification of a few different scenes, the classifier performed poorly when presented with more categories to discriminate. This behaviour indicates that the features used did not adequately capture the nuances separating different scenes and that representing the data in different ways may be beneficial to performance.
+It may be useful to do Fourier analysis in order to better represent the shape of a sound file’s magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn’t increase dimensionality too drastically. 
+The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems. 
+Smoothness of the different magnitude-mel band curves would be an interesting feature to look into using for future experiments. Features could potentially be derived from the location of maxima and minima as well as the smoothness between adjacent mel bands.
+There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in 
+\todo[inline]{flipItBoyo.png}
 
 
 \bibliographystyle{IEEEtranN}
