@@ -76,8 +76,8 @@
 
 % Abstract
 \begin{abstract}
-	This will be our abstract \\	
-	\lipsum[2]
+	Sound classification is an emerging field of research with multifarious technology and big-data applications. To promote research in this space, the DCASE Challenge was instigated with multiple tasks for competitors to attempt. Here, we have investigated the efficacy of Learning Classifier Systems applied to the problem of Acoustic Scene Classification. This involves predicting the environment in which a sound file was captured. Results indicate that even on a highly abbreviated feature set, Learning Classifier Systems can achieve modest accuracy in comparison to standard solutions.
+	\\
 \end{abstract}
 
 \begin{multicols}{2}
@@ -86,7 +86,7 @@
 \section{Introduction}
 
 
-\lipsum[1]
+\todo[inline]{Write introduction}
 
 
 
@@ -100,15 +100,15 @@ This section provides a brief review of learning classifier systems (\ref{sec:LC
 \subsection{Learning Classifier Systems}
 \label{sec:LCS}
 
-First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms \cite{Butz2015}. The core of LCSs is the population of rules, or \textit{classifiers}, which collectively form the solution to the given problem \cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and \textit{optimally general} set \cite{Urbanowicz2009}.
+First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms, including a genetic algorithm (GA) \cite{Butz2015}. The core of an LCS is a population of rules, or \textit{classifiers}, which collectively form the solution to the given problem \cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and maximally general set \cite{Urbanowicz2009}.
 
-The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- or rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem. Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this condition, perform this action'. Classifier fitness is evaluated based on feedback from the problem (also known as the environment).
+The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- in the form of rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem. Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this \textit{condition}, perform this \textit{action}'. Classifier fitness is evaluated based on feedback from the problem (generally referred to as the `environment').
 
-The learning process of a LCS includes a rule discovery method known as covering, a generalisation-pressure effect called subsumption, a generic algorithm (GA), fitness-based deletion to maintain a finite-sized population and, in some cases, reinforcement learning \cite{Butz2000}.
+The learning process of a LCS includes a rule discovery method known as covering, a generalisation-pressure effect called subsumption, a GA, fitness-based deletion to maintain a finite-sized population and, in some applications, reinforcement learning \cite{Butz2000}.
 
-The rule discovery method, covering, is used to initialise the population by adding a new classifier whenever a problem instance matches no existing classifier. Subsumption is used to eliminate classifiers with more specific conditions that are no more accurate than others with equivalent, but more general conditions. The GA is used as a secondary rule discovery method that only operates on high performing rules. Deletion is employed to maintain a finite population size by removing poorly performing classifiers. Reinforcement learning may be used as a final step in the learning cycle for problems where feedback from the environment is delayed.
+The rule discovery method, covering, is used to initialise the population by adding a new classifier whenever a problem instance matches no existing classifier. Subsumption is used to eliminate classifiers with more specific conditions that are no more accurate than others with equivalent, but more general conditions. The GA is used as a secondary rule discovery method that only operates on high performing rules. Deletion is employed to maintain a finite population size by removing poorly performing -- i.e. low fitness -- classifiers. Reinforcement learning may be used as a final step in the learning cycle for problems where feedback from the environment is delayed.
 
-A seminal work in the field of LCSs was the introduction of the eXtended Classifier System by Wilson \cite{Lanzi2008,Sigaud2007}. This incorporated a number of features which substantially improved the performance of the LCS \cite{Lanzi2008}.
+A seminal work in the field of LCSs was the introduction of the eXtended Classifier System \cite{Lanzi2008,Sigaud2007}. This incorporated a number of features which substantially improved the performance of LCSs \cite{Lanzi2008}.
 
 A key distinction amongst LCS applications is between supervised learning, in which feedback from the environment is delayed (such as robot navigation), and offline learning, where feedback is immediate and the correct action known in advance (such as classification tasks). This distinction determines whether reinforcement learning is necessary and affects how classifier accuracy is calculated.
 
@@ -117,26 +117,44 @@ A key distinction amongst LCS applications is between supervised learning, in wh
 \subsection{DCASE Challenge}
 \label{sec:DCASE}
 
-Sound classification, or machine listening, is seen as a promising research field with multifarious applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space by providing standardised 
+Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension \cite{Mesaros2017,DCASE2017asc}.
+
+The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long files for the datasets \cite{DCASE2017asc}. 
+
+A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel-band energies, as described in Section \todo[inline]{Add reference to Kevin's section} \cite{Mesaros2017}. 
 
 
 
-what (sound recognition, machine listening), why (motivations) and how (mechanics of challenge)
-
-baseline solution, best results
 
 
 \subsection{Acoustic Scene Classification}
 \label{sec:ASC}
 
-more detailed description of this particular task from the challenge
+The first task of the 2017 DCASE Challenge, and the focus of this paper, is acoustic scene classification. \citeauthor{Barchiesi2015} define this as ``the task of associating a semantic label to an audio stream that identifies the environment in which it has been produced'' \cite[p.~17]{Barchiesi2015}. Potential applications in this domain revolve around context aware smart devices, such as smartphones and hearing aids, that adjust their functioning based on the environments in which they find themselves \cite{Barchiesi2015}. 
+
+The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18-19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
+
+The results of the 2017 DCASE Challenge show that the baseline solution provided achieved an accuracy of 74.8\% on the development dataset and 61.0\% on the evaluation set averaged across all sound classifications \cite{DCASE2017asc}. Many entrants successfully outperformed the baseline on both the development and evaluation datasets; however, all algorithms performed worse on the evaluation set compared to the development set \cite{DCASE2017asc}. The best performing solution achieved an accuracy of 87.1\% and 83.3\% on the development and evaluation datasets, respectively \cite{DCASE2017asc,Mun2017}.
+
+
+
+
+
+
+\section{Feature Extraction}
+
+[KEVIN'S SECTION]
 
 
 
 \section{Experiments}
 \label{sec:exp}
 
-blah
+Data breakdown
+
+Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS]
+
+
 
 \subsection{Modification of Existing Code}
 \label{sec:ryan}
@@ -149,17 +167,31 @@ Description of Ryan's code, how we modified it and the results obtained
 
 
 
-\subsection{Adapted XCS(R) Design}
+\section{Experiment 2: Adapted XCS(R) Design}
 \label{sec:home}
 
-Details of the LCS we made, specific design changes relative to the standard implementation for our problem
+Details of the LCS we made, specific design changes relative to the standard 
+implementation for our problem
 
 
-\[
-\frac{\textrm{deletionThreshold}}{3.05}
+\subsection{Overview of Approach}
+
+
+
+
+\subsection{Parameters}
+
+
+
+\subsection{Problem-Specific Modifications}
+
+
+
+{\small \[
+\frac{exp_{min}}{3.05}
 \left(
-\pi/2-\arctan\left(\frac{\textrm{age} - \textrm{ageThreshold}}{20} \right) \right)
-\]
+\pi/2-\arctan\left(\frac{\textrm{age} - age_{min}}{20} \right) \right)
+\]}
 
 
 
@@ -220,7 +252,7 @@ Overall accuracy (all 15 features)
 
 \section{Conclusion}
 
-
+\todo[inline]{Write conclusion}
 
 
 
