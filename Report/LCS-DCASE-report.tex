@@ -117,9 +117,9 @@ A key distinction amongst LCS applications is between supervised learning, in wh
 \subsection{DCASE Challenge}
 \label{sec:DCASE}
 
-Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension \cite{Mesaros2017,DCASE2017asc}.
+Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension~\cite{Mesaros2017,DCASE2017asc}.
 
-The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long files for the datasets \cite{DCASE2017asc}. 
+The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long segments for the datasets \cite{DCASE2017asc}. Overall, 312 segments are provides for each context.
 
 A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel-band energies, as described in Section \todo[inline]{Add reference to Kevin's section} \cite{Mesaros2017}. 
 
@@ -132,7 +132,7 @@ A baseline system for this task is provided in Python and uses a neural network 
 
 The first task of the 2017 DCASE Challenge, and the focus of this paper, is acoustic scene classification. \citeauthor{Barchiesi2015} define this as ``the task of associating a semantic label to an audio stream that identifies the environment in which it has been produced'' \cite[p.~17]{Barchiesi2015}. Potential applications in this domain revolve around context aware smart devices, such as smartphones and hearing aids, that adjust their functioning based on the environments in which they find themselves \cite{Barchiesi2015}. 
 
-The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18-19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
+The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18--19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
 
 The results of the 2017 DCASE Challenge show that the baseline solution provided achieved an accuracy of 74.8\% on the development dataset and 61.0\% on the evaluation set averaged across all sound classifications \cite{DCASE2017asc}. Many entrants successfully outperformed the baseline on both the development and evaluation datasets; however, all algorithms performed worse on the evaluation set compared to the development set \cite{DCASE2017asc}. The best performing solution achieved an accuracy of 87.1\% and 83.3\% on the development and evaluation datasets, respectively \cite{DCASE2017asc,Mun2017}.
 
@@ -142,48 +142,149 @@ The results of the 2017 DCASE Challenge show that the baseline solution provided
 
 
 \section{Feature Extraction}
+\label{sec:feat}
 
-[KEVIN'S SECTION]
+\subsection{Feature Engineering}
+
+Feature engineering is a vital aspect of machine learning, as the way that data is presented to a predictive model has a large impact on the quality of results achieved \cite{Brownlee2014}. This is because features that don’t capture important information from the dataset effectively will not provide an accurate representation of the environment and may ignore useful patterns. Feature extraction is a method of deriving key information from a dataset into a useful format by using tools specific to the problem domain and typically results in a reduction in data dimensionality \cite{Howbert2012}. The “Curse of Dimensionality” is an important concept in the domain of machine learning that refers to the problem that as the dimensions of feature set increases, the volume of the feature space increases exponentially \cite{Keogh2010}. This has a particularly large impact on LCSs, as, with the exception of wildcards, the rule for every single feature is required to match with that of the instance to classify. To illustrate this, for a feature set of size 1000 and a classifier with 50\% wildcards, still 500 features from the environment instance would need to perfectly match the classifier’s corresponding rules and if even one of them does not, the instance will not be matched. One way to interpret this is that for a highly dimensional feature set each individual feature is insignificant \cite{Keogh2010}, but can have a large impact on the result.
+
+For the application of acoustic scene classification, defining features need to be extracted from sound files, and these need to be reduced to a dimensionality suitable for use in LCS rules.
+
+\subsection{Feature Extraction}
+
+The mel scale is a scale of pitches that was designed to vary linearly with a listener’s perception of a sound and is used in the LCS for sound data representation. It is an informal unit of measure that can be converted to from the frequency spectrum by using a function derived from what listeners judge to be pitches of equal distance from each other \cite{Luening1975}. There are various ways of converting from Hz to mels and a common method uses the equation  \cite{OShaughnessy1987}, a plot of which can be seen in 
+
+\todo[inline]{reference hz2mel.png}. 
+
+Acoustic classifiers often convert frequencies to the mel scale because its characteristic of mimicking human perception, and due to its logarithmic transformation of the frequency spectrum, it also results in dimension reduction when using bands as features \cite{Stowell2014}.
+
+\todo[inline]{--- hz2mel here ---}
+
+Initial feature extraction was done using the DCASE Baseline system’s included feature extractor, which makes use of python music and audio analysis package called LibROSA \cite{Heittola2017}. The feature extractor takes an audio file as an input and outputs an array in which each row is a time slice and each column is a feature, with the specifics dependent on a configurable parameters list. The parameters used can be seen in 
+
+\todo[inline]{reference parameters figure}. 
+
+Based on the settings used, the feature extractor output arrays with 501 time slices and 40 features, with each feature being the log of the magnitude of a band on the mel scale. This results in a feature set for each sound file of  dimensions.
+
+\todo[inline]{--- table here ---}
+
+\begin{table}
+	\caption{DCASE Baseline feature extractor parameters used}
+	\label{label}
+	\begin{tabular}{|l|l|}
+		\hline
+		Parameter 						& Value used \\ \hline
+		Maximum frequency for calculating MEL band	& 22050 \\
+		Minimum frequency for calculating MEL band	& 0	\\		
+		Sample frequency				& 44100\\
+		Hop length (samples)			&	882\\
+		Hop length (seconds)			& 0.02\\
+		Use htk style mel conversion	& false\\
+		Use log scale					& true\\
+		Feature extraction method		& MEL\\
+		Average multichannel audio to single channel & true\\
+		FFT length						& 2048\\
+		Number of MEL bands				& 40\\
+		Normalise MEL bands				& false\\
+		Type of spectrogram				& magnitude\\
+		Window length (samples)			& 1764\\
+		Window length (seconds)			& 0.04\\
+		Window type						& Hamming asymmetric
+	\end{tabular}
+\end{table}
+
+
+\subsection{Feature Reduction}
+
+The feature set extracted using the baseline system has a very high dimension, and in that form would be unsuitable for use with an LCS, as a feature set of that size would cause increased processing time as well as classifiers that are overfitted to specific instances. In order to perform dimensionality reduction without losing too much important information about that datasets, some visualisations were made to allow visual inspection and identification of trends to potentially be exploited. Each of the graphs shown in 
+\todo[inline]{reference beachgrid.png, cargrid.png, officegrid.png} 
+show the features extracted for a given sound file, with 9 different sound files of a given classification displayed together. Each line represents one of the 501 time slices and the magnitude of each mel band in that slice. 
+\todo[inline]{---3 grids here in 1 figure---}
+
+Comparing these graphs, it is clear that there are patterns common to individual classifications and that in a given sound file, the distribution of mel band magnitudes follows a similar pattern for many of the time slices. Given this similarity between time slices, it was decided that the mean and standard deviation of each mel band magnitude across all time slices would be used as the feature set, as this reduces the dimensionality by 250 times while maintaining a measure of both the trend and spread of the data. The three example classes shown in 
+\todo[inline]{reference beachgrid.png, cargrid.png, officegrid.png} 
+are shown again in 
+\todo[inline]{reference beach.png, car.png, office.png}, 
+with the difference that each line represents the average log magnitude of for each mel band in one sound file of the class shown rather than each line being one time slice of a single file. These graphs illustrate that by taking the mean magnitude for each mel band, the general trends are preserved, and though the spreading of these values between time slices is not represented, it is captured in the standard deviations for each mel band. The average mean and standard per mel band across all sound files of each example classification is shown in 
+\todo[inline]{reference 3means.png, 3stds.png} and illustrates that the differences between classifications is still captured by the chosen features despite the dimension reduction.
+\todo[inline]{---3 graphs (beach car and office.png) here in 1 fig---}
+\todo[inline]{---2 graphs (3means and 3stds (lol)) in 1 fig---}
+
+The amount of spread between different instances of each class observed in 
+\todo[inline]{reference beach.png, car.png, office.png}
+is noticeably large and would result in classifiers needing to have a large range of accepted values in order to catch many other instances of their classification. This spreading is potentially due to the sound files having different recorded volumes which may result in magnitude offset observed. In attempt to rectify this, the means were normalised such that in a given sound file, instead of using the means as features, the average across the means of each mel band was taken and the features used were the mel band means subtract the average mean. This method would make magnitude offset irrelevant while maintaining trends and is illustrated in 
+\todo[inline]{reference normalise.png} 
+with the results displayed in 
+\todo[inline]{reference beachVar.png, carVar.png, officeVar.png} 
+confirming that the general trends are preserved while reducing spread on the y axis. Unfortunately, upon testing this method was found to reduce classification accuracy so it was not used for further testing. Further analysis of the feature set showed that this is likely due to the offset of the mel band magnitudes being a defining characteristic of different scenes, which can be observed in 
+\todo[inline]{reference allMeans.png, allMeanVars.png} 
+in which the average means of each class are plotted on one graph and the average normalised means are plotted on another. The graph of average means shows that classes are distinct from one another based on their magnitude offset and the other shows that by normalising them this feature is lost. The reduction in accuracy may imply that either the difference in trend was not enough to make classes distinct from one another or potentially that more parameter tuning of the LCS would be needed to take advantage of the normalisation.
+
+\todo[inline]{---normalise.png here---}
+\todo[inline]{---beachVar, carVar and officeVar.png here---}
+\todo[inline]{---allMeans and allMeanVars.png here---}
 
 
 
-\section{Experiments}
-\label{sec:exp}
-
-Data breakdown
-
-Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS]
 
 
+\section{Experiment 1:\\LCS Baseline System}
+\label{sec:exp1}
 
-\subsection{LCS Baseline System}
-\label{sec:ryan}
+An investigation into LCSs built by others led us to sourcing from a sample system hosted on GitHub titled eLCS [?]. This Michigan-style classifier created by R. J. Urbanowicz [?] was developed as an educational tool that demonstrated the intricacies and components that contribute towards building a typical LCS. It consists of five demo folders showing the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population to run the LCS. For our purposes, we used the last folder ‘Demo 5’ as the starting point for constructing our LCS. This was used for the initialisation of the Github repository used for this experiment [?].
 
-Preliminary investigation into LCSs built by others, led us to sourcing from a sample system hosted on GitHub titled \textit{eLCS}. This Michigan-style classifier was developed as an educational tool which assisted with demonstrating the intricacies and components that contribute towards building a typical LCS. Five demo folders are utilized to show the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population is provided to run the LCS. The last folder in this system, titled \textit{‘Demo 5’} was utilized as a starting point for our baseline system.
+Preliminary steps towards understanding the functional processes of this LCS included refactoring and inserting comments while stepping through the code using a debugging process. From this it was discovered early in the process that the LCS had support for continuous values for attributes and could be initialised without a predefined rule population. These features which were not apparent during our project introduction presentati, greatly simplified the process of adapting our dataset to work with this implementation of an LCS. Other results from these works included: refactoring the LCS code to a submodule, creation of a ‘utils’ directory for preprocessing of feature files, creation of a ‘notebooks’ directory for visualising the results and a ‘docs’ directory for holding compiled documentation files. PDF generated documentation can be found at the root level of the repository.
+
+In order to utilize the dataset processed by the libROSA library in the DCASE baseline solution, further processing of this dataset needed to take place to make it suitable for our implementation. As the dataset was too large for importation into our LCS model, the first approach was to reduce its dimensionality by calculating the mean and standard deviation over the time series data. When calculated over the entire range, it reduced the size of the dataset by a factor of 256:1. Other approaches included dividing the time series data into even slices and calculating the mean and standard deviation on these individual segments. After applying this process the dataset was then optionally split into training and testing datasets of varying ratios, ensuring that an even number of features were maintained in each dataset.
 
 
 
 
 
-\section{Experiment 2: Adapted XCS(R) Design}
-\label{sec:home}
 
-Details of the LCS we made, specific design changes relative to the standard 
-implementation for our problem
+\section{Experiment 2:\\XCSR Implementation}
+\label{sec:exp2}
+
+In response to the positive results obtained from the baseline system described above, a separate LCS algorithm was coded by the authors. This provided much greater ability to control various aspects of the algorithm and more clarity as to the overall system's functioning. This section presents the general approach to developing this algorithm (Section~\ref{sec:exp2appr}), a description of each of the key parameters (Section~\ref{sec:exp2params}) and the key modifications made to the standard LCS design (Section~\ref{sec:exp2mods}).
+
+
+
 
 
 \subsection{Overview of Approach}
+\label{sec:exp2appr}
+
+The LCS algorithm developed by the authors was closely based on the structure and pseudocode provided by \citeauthor{Butz2000} in their paper entitled ``An Algorithmic Description of LCS'' \cite{Butz2000}. This paper provides detailed descriptions for each of the key modules within XCS, which is one of the most well-used LCS implementations \cite{Sigaud2007}. The decision to embark on developing our own LCS was largely based on the availability of the pseudocode in this paper.
+
+Two fundamental changes made to the algorithm presented by \citeauthor{Butz2000} were the change to continuous data, and hence continuously-valued classifier rules, and the switch from reinforcement learning to offline learning. Both changes necessitated a significant number of alterations throughout the algorithm. Various papers were consulted for how to make these changes. In particular, a number of papers on XCSR -- the standard continuous version of XCS -- were used \cite{Sowden2007,Stone2003,Wilson2000,Behdad2012}.
+
+The GA required a number of additional design decisions. These included the use of two-point crossover, roulette-wheel selection of parents and employing GA subsumption (parents can subsume children if more general). The GA was also applied in a `niched' manner, acting only on the correct set. Niched GA operation has been noted as a significant contributor to LCS performance \cite{Lanzi2008}. Accuracy-based fitness, another key contributor to LCS performance \cite{Lanzi2008}, was also used.
+
+As discussed in Section\todo[inline]{Add reference to Kevin's section}, the mean and standard deviation of log mel-bands were used as the features for this experiment. All 312 sound files from all of the 15 sound contexts were considered. That is, the LCS \textit{environment} consisted of 312 instances (sound files) per endpoint (context), giving a total of 4,680 instances, each containing 80 attributes (features; 40 means, 40 standard deviations). Data was split into training and testing datasets with a 60:40 ratio.
+
+
+
 
 
 
 
 \subsection{Parameters}
+\label{sec:exp2params}
 
+\todo[inline]{Import Yiyang's section}
 
 
 \subsection{Problem-Specific Modifications}
+\label{sec:exp2mods}
 
 
+Mutation scheme (plus note on probabilities: Sometimes a child will just be copies of their parents: P(no crossover) = 0.3, P(no mutation) = (0.98))
+
+Correct set subsumption -- criteria for most general classifier determined as most wildcards or equal most and largest range
+
+Subsumption conditions -- tolerance and removed wildcard criteria
+
+Deletion experience threshold -- changed deletion criteria so that classifiers with little utility (low match count) can be deleted, motivation was the really low average match count -- show graph of function
 
 {\small \[
 \frac{exp_{min}}{3.05}
@@ -193,22 +294,15 @@ implementation for our problem
 
 
 
-%- Feature Extraction, motivation for feature choices (i.e. feautres don't vary a lot across a file (low standard deviation), need to reduce the number of features)
-%
-%- Description of the code (the one we made outselved and Urbaonwicz's)
-%
-%- Parameters used
-%
-%Structure and design of algorithm: generic XCS modified for continuous data and offline learning
-%
-%Key modifications to basic LCs: (1) added tolerance to subsumption and removed wildcard criteria so that subsumption has some likelihood of occurring, (2) changed deletion criteria so that classifiers with little utility (low match count) can be deleted, motivation was the really low average match count, (3) action set subsumption criteria for most general classifier determined as most wildcards or equal most and largest range, (4) ...
-%
-%Show graph of function for deletion experience threshold (developed in response to \#2)
 
 
 
 
 \section{Results}
+
+\todo[inline]{Yiyang: feel free to mess around with the sub-headings under Results if you wish}
+
+
 
 
 \subsection{Environment Representations}
@@ -231,19 +325,20 @@ Alternative feature processing investigated
 Reason why standard deviation and mean are used, what information they carry
 
 
-
-
-\section{Discussion}
-
-
-
-
 Car and office confusion matrix
 Plot for std dev and mean (for car and office) to explain
 Car, office and city centre (with confusion and plots)
 Then add metro station and show results (worse) - explain why it is worse
 Show a classifier on a graph to show how it can match instances
 Overall accuracy (all 15 features)
+
+
+\section{Discussion}
+
+
+Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS / DCASE CHALLENGE SUBMISSIONS]
+
+
 
 
 

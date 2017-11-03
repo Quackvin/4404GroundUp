@@ -1,17 +1,17 @@
 _hash: 57a55966f25a1b3722bd922a63c75875
-fmax: 22050
-fmin: 0
-fs: 44100
-hop_length_samples: 882
+fmax: 22050                     # Max freq for calculating mel band
+fmin: 0                         # Min freq for same
+fs: 44100                       # Sampling frequency
+hop_length_samples: 882         # Window hop length
 hop_length_seconds: 0.02
-htk: false
-log: true
-method: mel
-mono: true
-n_fft: 2048
-n_mels: 40
+htk: false                      # Use htk style mel equation
+log: true                       # use log scale
+method: mel                     # Use mel bands
+mono: true                      # Multichannel audio averaged into single channel
+n_fft: 2048                     # FFT length
+n_mels: 40                      # Number of mel bands used
 normalize_mel_bands: false
 spectrogram_type: magnitude
-win_length_samples: 1764
+win_length_samples: 1764        # Window length
 win_length_seconds: 0.04
-window: hamming_asymmetric
+window: hamming_asymmetric      # Type

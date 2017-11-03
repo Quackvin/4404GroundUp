@@ -5,9 +5,6 @@ class LCS:
     # '#' indicates wildcard
     # correct count is used as the analog for experience (in classifier parameters)
     def __init__(self, parameterList , log):
-        """"
-        :parameterList :
-        """
         # Sets
         self.population = []
         self.matchSet = []
@@ -66,7 +63,6 @@ class LCS:
             if(classifierRules.centres[i] != "#"):
                 if(instanceFeatures[i] < classifierRules.getLowerBound(i,0) or
                            instanceFeatures[i] > classifierRules.getUpperBound(i,0)):
-                    # print('l:',classifierRules.getLowerBound(i,0),'F:',instanceFeatures[i],'u:',classifierRules.getUpperBound(i,0))
                     return False
         return True
 
@@ -85,7 +81,6 @@ class LCS:
         self.matchSet = incorrectSet  # matchSet currently is only consisting of incorrectSet, but the left over correct set will be added back later
 
 
-    # using currIter to give the classifier a number ID????
     def doCovering(self, instance):
         outcome = instance.outcome
         rules = classifierModule.Rules()
@@ -98,7 +93,7 @@ class LCS:
                 rules.ranges.append(abs(feat) * self.initialRangeFactor)
         classifier = (classifierModule.Classifier(self.currIter, outcome, rules))
 
-        # when a classifier is generated from covering, set its lastGAiteration as teh current iteration
+        # when a classifier is generated from covering, set its lastGAiteration as the current iteration
         classifier.lastGAIteration = self.currIter
 
         self.correctSet.append(classifier)
@@ -119,7 +114,6 @@ class LCS:
             classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
             classifier.matchCount)
             classifier.fitness = pow(classifier.accuracy, self.powerParameter)
-
             #fitness from "A Scalable Evolutionary Learning Classifier System for Knowledge Discovery in Stream Data Mining"
 
     # Move classifiers from the correct set back to the population
@@ -147,18 +141,11 @@ class LCS:
             voteSum = voteSum + self.deletionVote(self.population[i], popAveFitness)
             if voteSum >= choicePoint:
                 if self.population[i].numerosity > 1:
-                    # print('Deleting Classifier With Fitness:')
-                    # print(str(self.population[i].fitness) + '\nAccuracy:')
-                    # print(str(self.population[i].accuracy))
                     self.population[i].numerosity -= 1
                 else:
-                    # print('Deleting Classifier With Fitness:')
-                    # print('\t' + str(self.population[i].fitness) + '\nAccuracy:')
-                    # print('\t' + str(self.population[i].accuracy))
                     self.population.pop(i)
                 break
 
-    #make sure testing is deleting unfit classifiers
     def deletionVote(self, classifier, popAveFitness):
         vote = classifier.aveMatchSetSize * classifier.numerosity
         if classifier.matchCount > self.deletionThreshold*self.scaleDeletionThreshold(self.currIter-classifier.birthIteration) \
@@ -168,7 +155,6 @@ class LCS:
                 vote = vote * popAveFitness / self.featurePrecision
             else:
                 vote = vote * popAveFitness / (classifier.fitness/classifier.numerosity)
-
         return vote
 
     # only for testing and monitoring
@@ -204,7 +190,6 @@ class LCS:
         return (math.pi/2 - math.atan((age-ageThresh)/20))/3.05
 
 
-#########################################################################
 
     # TASK: description
     #
@@ -218,17 +203,10 @@ class LCS:
     # Called by main
     #
     def GA(self, instanceFeatures):
-
-        # TASK: check average time since last GA iteration, run if above threshold
-
         # Update last GA iteration for all classifiers in correct set
         self.updateLastGAIterations()
 
         # Select parents
-        # parent1 = self.selectParent()
-        # parent2 = self.selectParent()
-
-        # using selectParent_nonrepeat()
         [parent1, parent2] = self.selectParents_nonrepreat()
 
         # Initialise children
@@ -263,7 +241,6 @@ class LCS:
             elif self.doesSubsume(parent2, child1):
                 parent2.numerosity += 1
             else:
-                #print("... child 1 added to population")
                 self.correctSet.append(child1)
 
             # Second child
@@ -272,7 +249,6 @@ class LCS:
             elif self.doesSubsume(parent2, child2):
                 parent2.numerosity += 1
             else:
-                #print("... child 2 added to population")
                 self.correctSet.append(child2)
 
     # getAverageTimePeriod()
@@ -288,7 +264,6 @@ class LCS:
             numerositySum += classifier.numerosity
     
         avgTs = ts/numerositySum
-        #print("Average Time Period: "+str(avgTs))
         return avgTs
 
     # updateLastGAIterations
@@ -297,6 +272,7 @@ class LCS:
     def updateLastGAIterations(self):
         for classifier in self.correctSet:
             classifier.lastGAIteration = self.currIter
+
 
     # selectParents
     # Called by GA
@@ -374,17 +350,12 @@ class LCS:
     # Note: crossover is limited to occur only between components of the rule, not between
     # alleles. That is, the crossover point will never be between a centre and its corresponding
     # range value. The crossover point will never split a (centre, range) pair.
-    #
-    # ENHACEMENT-: add option for single point crossover
-    # TASK: averaging of child parameters, weighted average based on the amount crossed over This
-    # would be an improvement compared to Butz & Wilson
     def doCrossover(self, childA, childB):
         n_conditions = len(childA.rules.centres)	# number of components in a classifier rule
         x = random.random()*n_conditions			# continuous implementation has two alleles per component
         y = random.random()*n_conditions
         if x > y:
-            # x is the smaller value
-            x, y = y, x
+            x, y = y, x     # x is the smaller value
 
         i = 0
         while i < y:
@@ -408,7 +379,7 @@ class LCS:
     # 2. Non-wildcard to wildcard: performed with probability probabilityWildcardMutation
     # 3. Wildcard to non-wildcard: similar to Stone & Bull (2003), this is performed by
     #	 initialising the rule (centre and range) based on the current environment instance.
-    #	 The centre value is calculated by multilying the instance value by a random factor
+    #	 The centre value is calculated by multiplying the instance value by a random factor
     #	 close to 1. range is calculated as initialRangeFactor times the centre value.
     def doMutation(self, child, instanceFeatures):
         # Mutation of rule centre values
@@ -425,10 +396,7 @@ class LCS:
                 # Non-wildcard to non-wildcard
                 else:
                     child.rules.centres[i] += self.mutationScale * random.uniform(-1,1)
-                ###############################
-                # KEVIN: Should a range be added on here? (use abs() so range is always positive)
-                ###############################
-
+                
         # Mutation of rule range values
         for i in range(0,len(child.rules.ranges)):
             # Mutate allele stochastically
@@ -497,7 +465,8 @@ class LCS:
     def isMoreGeneral(self, subsumer, subsumee):
         for i in range(0, len(subsumer.rules.centres)):
             # If the subsumee has a wildcard that the subsumer does not, return False
-            if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
+            # EDIT: This condition has been removed since it was prohibitively restrictive
+            if subsumee.rules.centres[i] == '#' or subsumer.rules.centres[i] == '#':
                 continue
                 #return False
             # If neither has a wildcard, check upper and lower bounds
@@ -547,13 +516,9 @@ class LCS:
 
         # Perform subsumption if a suitable mostGeneralClassifier was found
         if len(mostGeneralClassifier.rules.centres) != 0:
-
-            print("... doing correct set subsumption")
-
             self.correctSet = []   # reset correct set
             for classifier in tmpCorrectSet:
                 if self.isMoreGeneral(mostGeneralClassifier, classifier):
-                    print("... subsumed a classifier")
                     mostGeneralClassifier.numerosity += classifier.numerosity
                 else:
                     self.correctSet.append(classifier)

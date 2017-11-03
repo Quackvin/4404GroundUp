@@ -96,15 +96,16 @@ def method3():
                             j += 1
                             if j % 4 == 0:
                                 j = 0
-                                TestFile.write(newline)
+                                TestFil
+                                e.write(newline)
                             else:
                                 TrainFile.write(newline)
 def method4():
     for filename in os.listdir('./data'):
-        if 'car' in filename or 'office' in filename or 'city_center' in filename or 'forest_path' in filename :
+        if 'car' in filename or 'office' in filename or 'city_center' in filename or 'forest_path' in filename or 'metro_station' in filename :
             with open('./data/'+filename, 'r') as ReadFile:
-                with open('data_office_car_city_forest_training.txt', 'a') as TrainFile:
-                    with open('data_office_car_city_forest_testing.txt', 'a') as TestFile:
+                with open('data_office_car_city_forest_metro_training.txt', 'a') as TrainFile:
+                    with open('data_office_car_city_forest_metro_testing.txt', 'a') as TestFile:
                         j = 0
                         for line in ReadFile:
                             j += 1
@@ -159,6 +160,6 @@ def method5():
 		for line in data_testing:
 			saveFile.write(line)
 
-method5()
+method4()
 # method4()
 # method2('data_MeanVar.txt')
