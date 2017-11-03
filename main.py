@@ -43,13 +43,11 @@ def train(trainingFile, parameterList, log, saveFile, loadPop):
 		for instance in env.instances:
 			lcs.currIter += 1
 
-			# Generate match set
+			# Generate match set, record matchSetSize for later use
 			matchSetSize = lcs.doMatching(instance)
 
-			# Generate correct set
 			lcs.doCorrectSet(instance)
 
-			# Do covering if there are no matches
 			if len(lcs.correctSet) == 0:
 				lcs.doCovering(instance)
 
@@ -58,19 +56,17 @@ def train(trainingFile, parameterList, log, saveFile, loadPop):
 
 			# Perform genetic algorithm
 			if len(lcs.correctSet) > 2 and (lcs.getAverageTimePeriod() > lcs.GAThreshold) :
-				print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run')
+				print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run: 1', end='   \r', flush=True)
 				lcs.GA(instance.features)  # includes GA subsumption
 			else:
-				print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)))
+				print('iteration: ', lcs.currIter, " --- CorrectSet size: ", str(len(lcs.correctSet)), ' --- GA run: 0', end='   \r', flush=True)
 
-			# Correct set subsumption
 			if lcs.doCorrectSetSubsumption:
 				lcs.correctSetSubsumption()
 
-			# Put everything back in the population
+			# Put classifiers from correct and match sets back in the population
 			lcs.consolidateClassifiers()
 
-			# Enforce max population size
 			if len(lcs.population) > lcs.maxPopSize:
 				lcs.doDeletion()
 
@@ -82,11 +78,12 @@ def train(trainingFile, parameterList, log, saveFile, loadPop):
 
 def test(testfile, parameterList , log , saveFile):
 	print('**********Testing Start*********')
-
+	# Load testing instances from file
 	env = environment.Environment(testfile)
+	# Initialise LCS
 	lcs = lcsModule.LCS(parameterList, log)
+	# Load trained population
 	loadPopulation(lcs, saveFile)
-
 
 	correctCount = 0
 	numberOfInstance = 0
@@ -96,11 +93,11 @@ def test(testfile, parameterList , log , saveFile):
 	confusionMatrix_ratio  = env.initConfusionMatrix()
 
 	for instance in env.instances:
-
 		numberOfInstance += 1
+
+		# Check instance against classifier population
 		result = lcs.classifyInstance(instance)
 
-		# print("LCS decision: " + str(result) + "    True anser: " + str(instance.outcome))
 		if result == -1:
 			numberOfUncovered += 1
 			confusionMatrix[instance.outcome]["Uncovered"] += 1

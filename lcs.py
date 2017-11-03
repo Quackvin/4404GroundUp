@@ -5,9 +5,6 @@ class LCS:
     # '#' indicates wildcard
     # correct count is used as the analog for experience (in classifier parameters)
     def __init__(self, parameterList , log):
-        """"
-        :parameterList :
-        """
         # Sets
         self.population = []
         self.matchSet = []
@@ -66,7 +63,6 @@ class LCS:
             if(classifierRules.centres[i] != "#"):
                 if(instanceFeatures[i] < classifierRules.getLowerBound(i,0) or
                            instanceFeatures[i] > classifierRules.getUpperBound(i,0)):
-                    # print('l:',classifierRules.getLowerBound(i,0),'F:',instanceFeatures[i],'u:',classifierRules.getUpperBound(i,0))
                     return False
         return True
 
@@ -85,7 +81,6 @@ class LCS:
         self.matchSet = incorrectSet  # matchSet currently is only consisting of incorrectSet, but the left over correct set will be added back later
 
 
-    # using currIter to give the classifier a number ID????
     def doCovering(self, instance):
         outcome = instance.outcome
         rules = classifierModule.Rules()
@@ -98,7 +93,7 @@ class LCS:
                 rules.ranges.append(abs(feat) * self.initialRangeFactor)
         classifier = (classifierModule.Classifier(self.currIter, outcome, rules))
 
-        # when a classifier is generated from covering, set its lastGAiteration as teh current iteration
+        # when a classifier is generated from covering, set its lastGAiteration as the current iteration
         classifier.lastGAIteration = self.currIter
 
         self.correctSet.append(classifier)
@@ -119,7 +114,6 @@ class LCS:
             classifier.aveMatchSetSize = (classifier.aveMatchSetSize * (classifier.matchCount - 1) + matchSetSize) / (
             classifier.matchCount)
             classifier.fitness = pow(classifier.accuracy, self.powerParameter)
-
             #fitness from "A Scalable Evolutionary Learning Classifier System for Knowledge Discovery in Stream Data Mining"
 
     # Move classifiers from the correct set back to the population
@@ -147,14 +141,8 @@ class LCS:
             voteSum = voteSum + self.deletionVote(self.population[i], popAveFitness)
             if voteSum >= choicePoint:
                 if self.population[i].numerosity > 1:
-                    # print('Deleting Classifier With Fitness:')
-                    # print(str(self.population[i].fitness) + '\nAccuracy:')
-                    # print(str(self.population[i].accuracy))
                     self.population[i].numerosity -= 1
                 else:
-                    # print('Deleting Classifier With Fitness:')
-                    # print('\t' + str(self.population[i].fitness) + '\nAccuracy:')
-                    # print('\t' + str(self.population[i].accuracy))
                     self.population.pop(i)
                 break
 
@@ -168,7 +156,6 @@ class LCS:
                 vote = vote * popAveFitness / self.featurePrecision
             else:
                 vote = vote * popAveFitness / (classifier.fitness/classifier.numerosity)
-
         return vote
 
     # only for testing and monitoring
@@ -225,10 +212,6 @@ class LCS:
         self.updateLastGAIterations()
 
         # Select parents
-        # parent1 = self.selectParent()
-        # parent2 = self.selectParent()
-
-        # using selectParent_nonrepeat()
         [parent1, parent2] = self.selectParents_nonrepreat()
 
         # Initialise children
@@ -263,7 +246,6 @@ class LCS:
             elif self.doesSubsume(parent2, child1):
                 parent2.numerosity += 1
             else:
-                #print("... child 1 added to population")
                 self.correctSet.append(child1)
 
             # Second child
@@ -272,7 +254,6 @@ class LCS:
             elif self.doesSubsume(parent2, child2):
                 parent2.numerosity += 1
             else:
-                #print("... child 2 added to population")
                 self.correctSet.append(child2)
 
     # getAverageTimePeriod()
@@ -288,7 +269,6 @@ class LCS:
             numerositySum += classifier.numerosity
     
         avgTs = ts/numerositySum
-        #print("Average Time Period: "+str(avgTs))
         return avgTs
 
     # updateLastGAIterations
@@ -547,13 +527,9 @@ class LCS:
 
         # Perform subsumption if a suitable mostGeneralClassifier was found
         if len(mostGeneralClassifier.rules.centres) != 0:
-
-            print("... doing correct set subsumption")
-
             self.correctSet = []   # reset correct set
             for classifier in tmpCorrectSet:
                 if self.isMoreGeneral(mostGeneralClassifier, classifier):
-                    print("... subsumed a classifier")
                     mostGeneralClassifier.numerosity += classifier.numerosity
                 else:
                     self.correctSet.append(classifier)
