@@ -76,63 +76,51 @@
 
 % Abstract
 \begin{abstract}
-	Sound classification is an emerging field of research with multifarious technology and big-data applications. To promote research in this space, the DCASE Challenge was instigated with multiple tasks for competitors to attempt. Here, we have investigated the efficacy of Learning Classifier Systems applied to the problem of Acoustic Scene Classification. This involves predicting the environment in which a sound file was captured. Results indicate that even on a highly abbreviated feature set, Learning Classifier Systems can achieve modest accuracy in comparison to standard solutions.
+	Sound classification is an emerging field of research with multifarious technology and big-data applications. To promote research in this space, the DCASE Challenge was instigated to allow competitors to apply audio processing techniques to solve different types of audio classifcation problems. In this report, we have investigated the efficacy of Learning Classifier Systems applied to the problem of Acoustic Scene Classification. This involves predicting the environment in which a sound file was captured. Results indicate that even on a highly abbreviated feature set, Learning Classifier Systems can achieve modest accuracy in comparison to standard solutions.
 \end{abstract}
 
 %\begin{multicols}{2}
 
-
 \section{Introduction}
 
-Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so taking a new approach, Learning Classifier Systems (LCSs) was explored as an alternative means of training a classification model.
+The Detection and Classification of Acoustic Scenes and Events (DCASE) challenge is an annual competition which sets a number of sound related tasks for competitors to complete. The event encourages competitors to utilize past solutions, allowing submissions to regularly push the boundaries of machine sound perception and continuously improve on previously built models. The vast majority of entrants to the competition use neural networks to train models, so the application of a Learning Classifier System (LCS) to this problem was seen as a great alternative to exploring its use in application of sound classification.
 
-LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing; an instance is classified based on a vote from the population.
+LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a Genetic Algorithm (GA) to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing where an instance is classified based on a vote from the population.
 
-Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system's feature extraction tool, with the first experimenting with a pre-built LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs' parameters and determine the how well these systems are able to classify scenes based on acoustic features.
-
-
-
+Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE baseline system's feature extraction tool, with the first experimenting with a pre-built LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs' parameters and determine the how well these systems are able to classify scenes based on acoustic features.
 
 \section{Background}
 
 This section provides a brief review of learning classifier systems (\ref{sec:LCS}), the DCASE Challenge (\ref{sec:DCASE}) and acoustic scene classification (\ref{sec:ASC}).
 
-
-
 \subsection{Learning Classifier Systems}
 \label{sec:LCS}
 
-First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms, including a genetic algorithm (GA) \cite{Butz2015}. The core of an LCS is a population of rules, or \textit{classifiers}, which collectively form the solution to the given problem~\cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and maximally general set \cite{Urbanowicz2009}.
+First introduced in the mid-1970s, Learning Classifier Systems (LCSs) are a rule-based machine leaning algorithm with a unique combination of learning mechanisms, including a Genetic Algorithm (GA) \cite{Butz2015}. The core of an LCS is a population of rules, or \textit{classifiers}, which collectively form the solution to the given problem~\cite{Urbanowicz2009}. This population of classifiers is gradually evolved toward an optimal and maximally general set \cite{Urbanowicz2009}.
 
 The motivation for this structure is that, when modelling and attempting to predict the outcome of complex systems, a desirable approach is to develop a distributed population of classifiers -- in the form of rules -- that together form an accurate model \cite[p.~2]{Urbanowicz2009}. Each classifier, then, spans a subspace of the problem, with the population spanning the entire problem. Individual classifiers consist of a condition-action rule which says: 'If a problem instance matches this \textit{condition}, perform this \textit{action}'. In these condition-action pairs, each condition is actually a set of conditions corresponding to the features in the instance's feature set and may either contain a value to be matched, or a "wildcard" that can match any value. In order for a condition to match a problem instance, every feature in the instance must matched its corresponding condition in the classifier. Classifier fitness is evaluated based on feedback from the problem (generally referred to as the `environment').
 
-The learning process of a LCS includes a rule discovery method known as covering, a generalisation-pressure effect called subsumption, a GA, fitness-based deletion to maintain a finite-sized population and, in some applications, reinforcement learning \cite{Butz2000}.
+The learning process of a LCS includes a rule discovery method known as covering, a generalisation-pressure effect called subsumption, a GA, fitness-based deletion method to maintain a finite-sized population and, in some applications, reinforcement learning \cite{Butz2000}.
 
 The rule discovery method, covering, is used to initialise the population by adding a new classifier whenever a problem instance matches no existing classifier. Subsumption is used to eliminate classifiers with more specific conditions that are no more accurate than others with equivalent, but more general conditions. The GA is used as a secondary rule discovery method that only operates on high performing rules. Deletion is employed to maintain a finite population size by removing poorly performing -- i.e. low fitness -- classifiers. Reinforcement learning may be used as a final step in the learning cycle for problems where feedback from the environment is delayed.
 
-A seminal work in the field of LCSs was the introduction of the eXtended Classifier System~\cite{Lanzi2008,Sigaud2007}. This incorporated a number of features which substantially improved the performance of LCSs~\cite{Lanzi2008}.
+A seminal work in the field of LCSs was the introduction of the eXtended Classifier System (XCS)~\cite{Lanzi2008,Sigaud2007}. This incorporated a number of features which substantially improved the performance of LCSs~\cite{Lanzi2008}.
 
 A key distinction amongst LCS applications is between supervised learning, in which feedback from the environment is delayed (such as robot navigation), and offline learning, where feedback is immediate and the correct action known in advance (such as classification tasks). This distinction determines whether reinforcement learning is necessary and affects how classifier accuracy is calculated.
-
-
 
 \subsection{DCASE Challenge}
 \label{sec:DCASE}
 
-Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension~\cite{Mesaros2017,DCASE2017asc}.
+Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension of their own systems~\cite{Mesaros2017,DCASE2017asc}.
 
-The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long segments for the datasets \cite{DCASE2017asc}. Overall, 312 segments are provides for each context.
+The challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long segments for the datasets \cite{DCASE2017asc}. Overall, 312 segments are provides for each context.
 
-A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel band energies, as described in Section Section~\ref{sec:featExt} \cite{Mesaros2017}. 
-
-
-
-
+A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel band energies, as described in Section Section~\ref{sec:featExt} \cite{Mesaros2017}.
 
 \subsection{Acoustic Scene Classification}
 \label{sec:ASC}
 
-The first task of the 2017 DCASE Challenge, and the focus of this paper, is acoustic scene classification. \citeauthor{Barchiesi2015} define this as ``the task of associating a semantic label to an audio stream that identifies the environment in which it has been produced'' \cite[p.~17]{Barchiesi2015}. Potential applications in this domain revolve around context aware smart devices, such as smartphones and hearing aids, that adjust their functioning based on the environments in which they find themselves \cite{Barchiesi2015}. 
+The first task of the 2017 DCASE Challenge, and the focus of this paper, is acoustic scene classification. \citeauthor{Barchiesi2015} define this as ``the task of associating a semantic label to an audio stream that identifies the environment in which it has been produced'' \cite[p.~17]{Barchiesi2015}. Potential applications in this domain revolve around context aware smart devices, such as smartphones and hearing aids, that adjust their functioning based on the environments in which they find themselves \cite{Barchiesi2015}.
 
 The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18--19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
 
@@ -208,7 +196,7 @@ Based on the settings used, the feature extractor output arrays with 501 time sl
 \subsection{Feature Reduction}
 \label{sec:featReduce}
 
-The feature set extracted using the baseline system has a very high dimension, and in that form would be unsuitable for use with an LCS as a feature set of that size would cause increased processing time as well as classifiers that are overfitted to specific instances. In order to perform dimensionality reduction without losing too much important information about the datasets, some visualisations were made to facilitate identification of trends to potentially be exploited. Each of the graphs shown in Figure~\ref{fig:beachCarOffice} show the features extracted for a given sound file, with 9 different sound files of a given classification displayed together for the beach, car and office classifications. Each line represents one of the 501 time slices and the magnitude of each mel band in that slice. 
+The feature set extracted using the baseline system has a very high dimension, and in that form would be unsuitable for use with an LCS as a feature set of that size would cause increased processing time as well as classifiers that are overfitted to specific instances. In order to perform dimensionality reduction without losing too much important information about the datasets, some visualisations were made to facilitate identification of trends to potentially be exploited. Each of the graphs shown in Figure~\ref{fig:beachCarOffice} show the features extracted for a given sound file, with 9 different sound files of a given classification displayed together for the beach, car and office classifications. Each line represents one of the 501 time slices and the magnitude of each mel band in that slice.
 
 \begin{figure}[!htbp]
 	\centering
@@ -420,13 +408,13 @@ The behaviour of LCS is controlled by a total of 14 parameters. These parameters
 	\itemsep0em
 	\item \textbf{Maximum Number of Iteration}: This number determines how many iteration the LCS system will run through the data set. The system will stop once its iteration count has reached this number.
 	\item \textbf{Maximum Population Size}: This number controls the size of the number of classifiers allowed to reside in the    population. Once the numbers of classifiers discovered by LCS system reached this threshold, deletion will occur. A low value on this parameters results in frequent deletion, which in turn allows more general rules to survive.
-	\item \textbf{Covering Wildcard Probability}: This parameter applies to the covering stage of the learning process. It specifies the probability of each attribute of a given instance being casted into a wildcard, meaning that this newly generated rule will disregard the value of this attribute in its decision making. A large number on this parameters tends to generate more general rules, as it is more prone to ignore an attributes value in deciding on an action. 
-	\item \textbf{Initial Range Factor}: This parameter also controls the behaviours of LCS in covering stage. As discussed in the previous section. If an attribute is not casted into a wildcard, then the rule generated through covering will set the centre of this attribute to be the current value, and its range will be determined by multiplying its current value with the initial range factor. A large value will generated rules covering a large spectrum of the dataset.  
+	\item \textbf{Covering Wildcard Probability}: This parameter applies to the covering stage of the learning process. It specifies the probability of each attribute of a given instance being casted into a wildcard, meaning that this newly generated rule will disregard the value of this attribute in its decision making. A large number on this parameters tends to generate more general rules, as it is more prone to ignore an attributes value in deciding on an action.
+	\item \textbf{Initial Range Factor}: This parameter also controls the behaviours of LCS in covering stage. As discussed in the previous section. If an attribute is not casted into a wildcard, then the rule generated through covering will set the centre of this attribute to be the current value, and its range will be determined by multiplying its current value with the initial range factor. A large value will generated rules covering a large spectrum of the dataset.
 	\item \textbf{Power Parameter}:	This value is used to convert a classifier's accuracy to fitness, which is needed in the GA subsystem. Fitness of a classifier is calculated using the following formula:	$Fitness = (Accuracy)^{Power Parameter}$. This value is typical set as 5. Other values were also investigated to observe the effect.
-	\item \textbf{Deletion Threshold}: A classifier is considered as a potential candidate for deletion when its experience i.e the number of times this classifier has been matched by an instance is above this threshold. 
-	\item \textbf{Deletion Fitness Scale}: A classifier is also considered as a potential candidate for deletion when its fitness it below a percentage of the average fitness of the entire population. This percentage is controlled by this deletion fitness sacle parameter. 
-	\item \textbf{GA Threshold}: This parameters controls the frequency of GA being run among the correct set of classifiers. The GA subsystem is only allowed to run when the average of iteration since last GA of all classifiers exceeds this threshold. A small number on this parameter will result in GA operating more frequently, will in turns leads to more rules being discovered and added in the population.  
-	\item \textbf{Probability Crossover}: The parameter specifies the probability a child will be generated from a crossover process in the GA subsystem. 
+	\item \textbf{Deletion Threshold}: A classifier is considered as a potential candidate for deletion when its experience i.e the number of times this classifier has been matched by an instance is above this threshold.
+	\item \textbf{Deletion Fitness Scale}: A classifier is also considered as a potential candidate for deletion when its fitness it below a percentage of the average fitness of the entire population. This percentage is controlled by this deletion fitness scale parameter.
+	\item \textbf{GA Threshold}: This parameters controls the frequency of GA being run among the correct set of classifiers. The GA subsystem is only allowed to run when the average of iteration since last GA of all classifiers exceeds this threshold. A small number on this parameter will result in GA operating more frequently, will in turns leads to more rules being discovered and added in the population.
+	\item \textbf{Probability Crossover}: The parameter specifies the probability a child will be generated from a crossover process in the GA subsystem.
 	\item \textbf{Probability Allele Mutation}: The probability an attribute of a classifier undergo allele mutation.
 	\item \textbf{Probability Wildcard Mutation}: The probability an attribute of a classifier get casted into a wildcard.
 	\item \textbf{Mutation Scale}: This extent to which the centre and range of a classifier can be mutated.
@@ -519,9 +507,9 @@ This section reports on the results of Experiment 2. Section~\ref{sec:paramTune}
 
 The parameters of LCS has a significant impact upon the performance of the system. Initially a separate GA component specifically for parameter tuning was proposed, to explore different combination of parameters that can produce optimum accuracy for the LCS system. However, it was soon realized that it is infeasible to do so as under current implementation each run of the LCS takes around 15 to 18 minutes to finish, meaning that GA would not be able to explore enough search space of the parameters given the limited time available.
 
-Instead, parameters tuning is done manually using an iterative approach. The process involves running the LCS system and observe the final accuracy on testing data with only one parameter changed at a time. This allows comparison between the effect on accuracy for one parameters on different values. 
+Instead, parameters tuning is done manually using an iterative approach. The process involves running the LCS system and observe the final accuracy on testing data with only one parameter changed at a time. This allows comparison between the effect on accuracy for one parameters on different values.
 
-After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration,Maximum Population Size,Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.  
+After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration,Maximum Population Size,Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.
 
 Overall Maximum Number Of Iteration,Maximum Population Size and Initial Range Factor together has the biggest impact on the accuracy of the LCS system. The selection of those parameters also depends on the number of training sample. If the number of instances in the training sample is large, the number of iteration LCS should run needs to be increased as well.
 
@@ -555,7 +543,7 @@ First, the simplest case of classifying between only two classes of sound files 
 
 Next the above experiment was extended by the addition the city centre data. The system converged on accuracy of 95\% at around 1,000 iterations, representing a decrease by 2\% relative to the previous testing result when only two classes were involved.
 
-It can be observed that the system has the best performance on classifying office, where 100\% of the testing instances were correctly classified. The accuracy of classification on car has been reduced down to 88.5\% from around 97\% in the previous test. 
+It can be observed that the system has the best performance on classifying office, where 100\% of the testing instances were correctly classified. The accuracy of classification on car has been reduced down to 88.5\% from around 97\% in the previous test.
 
 \begin{figure}[!htbp]
 	\centering
@@ -608,7 +596,7 @@ The system converged on a much lower accuracy (80\%) when data from four classes
 
 
 
-As shown in the previous three tests, as the number of classes in the testing data increases, the overall accuracy of the LCS system decreases. This is as expected as the introduction of more classes will inevitably introduce many noise to the classifiers as well.  When all the classes in the testing dataset were used, it was observed that the overall accuracy decreased to around 44\%. 
+As shown in the previous three tests, as the number of classes in the testing data increases, the overall accuracy of the LCS system decreases. This is as expected as the introduction of more classes will inevitably introduce many noise to the classifiers as well.  When all the classes in the testing dataset were used, it was observed that the overall accuracy decreased to around 44\%.
 
 
 
@@ -633,7 +621,7 @@ The LCS system demonstrated good classification accuracy when data of three clas
 	\label{fig:avgAndStd3}
 \end{figure}
 
-Figure~\ref{fig:avgAndStd3}(a) is the average standard deviations for each mel band (attribute) across all instances in the dataset for class ``car'',''office'' and ``city centre'', while Figure~\ref{fig:avgAndStd3}(b) is the average means for each mel band (attribute) across all instances for the same classes.  These two graphs represents the general trend of all instances belonging to those classes in the dataset.  As it can be observed, those three lines  in each of the figure are relatively distinct from each other, meaning that it is relatively easy for the LCS system to generate rules that can distinguish them from each other. 
+Figure~\ref{fig:avgAndStd3}(a) is the average standard deviations for each mel band (attribute) across all instances in the dataset for class ``car'',''office'' and ``city centre'', while Figure~\ref{fig:avgAndStd3}(b) is the average means for each mel band (attribute) across all instances for the same classes.  These two graphs represents the general trend of all instances belonging to those classes in the dataset.  As it can be observed, those three lines  in each of the figure are relatively distinct from each other, meaning that it is relatively easy for the LCS system to generate rules that can distinguish them from each other.
 
 However, when class ``metro station'' are added in the dataset, as reflected in Figure~\ref{fig:avgAndStd4} where the lines are not as distinct as before. The curve of city centre and metro station follow a similar trend, meaning that if the range covered by one classifier could potentially cover the curve for the other class as well. Therefore, it is unsurprising that metro station has a 35\% chance of being falsely classified as city centre.
 
@@ -653,9 +641,9 @@ However, when class ``metro station'' are added in the dataset, as reflected in 
 	\label{fig:avgAndStdAll}
 \end{figure}
 
-Figure~\ref{fig:avgAndStdAll} showcases the characteristics curve for all 16 classes. It is clear that the curve for many classes are clustered together, meaning that the classifiers in the LCS system have a very high chance of grouping the curve belonging to several classes into one set of rules. Thus the low accuracy of classifying 16 classes can be understood. 
+Figure~\ref{fig:avgAndStdAll} showcases the characteristics curve for all 16 classes. It is clear that the curve for many classes are clustered together, meaning that the classifiers in the LCS system have a very high chance of grouping the curve belonging to several classes into one set of rules. Thus the low accuracy of classifying 16 classes can be understood.
 
-In general, the reduction of features means that a large proportion of information is thrown away. Given the fact that there are 80 attributes in a instance and each of them are continuous, the amount of training data (around 4,000) is insufficient for LCS to generate accurate rules to classify classes that has their characteristic curves clustered together as shown in the figures above. 
+In general, the reduction of features means that a large proportion of information is thrown away. Given the fact that there are 80 attributes in a instance and each of them are continuous, the amount of training data (around 4,000) is insufficient for LCS to generate accurate rules to classify classes that has their characteristic curves clustered together as shown in the figures above.
 
 
 \begin{figure}[!htbp]
@@ -681,10 +669,10 @@ In general, the reduction of features means that a large proportion of informati
 
 As previously discussed, quality of the results achieved by a machine learning system is highly dependent on the quality of the features used as input. While reducing the dimension of the data by taking the mean and standard deviation of the mel bands worked well for classification of a few different scenes, the classifier performed poorly when presented with more categories to discriminate. This behaviour indicates that the features used did not adequately capture the nuances separating different scenes and that representing the data in different ways may be beneficial to performance.
 
-It may be useful to do Fourier analysis in order to better represent the shape of a sound file's magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn't increase dimensionality too drastically. 
+It may be useful to do Fourier analysis in order to better represent the shape of a sound file's magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn't increase dimensionality too drastically.
 
 The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems.
- 
+
 Smoothness of the different magnitude-mel band curves would be an interesting feature to look into using for future experiments. Features could potentially be derived from the location of maxima and minima as well as the smoothness between adjacent mel bands.
 
 There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in Figure~\ref{fig:flipItBoyo}.
