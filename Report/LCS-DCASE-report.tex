@@ -506,14 +506,6 @@ Where $exp_{min}$ is the initial minimum experience threshold (that will apply t
 
 \section{Results}
 
-\todo[inline]{Yiyang: feel free to mess around with the sub-headings under Results if you wish}
-
-
-
-
-\subsection{Environment Representations}
-
-Alternative feature processing investigated
 
 
 
@@ -526,6 +518,13 @@ Alternative feature processing investigated
 %
 %Theoretical analysis?
 
+The parameters of LCS has a significant impact upon the performance of the system. Initially a separate GA component specifically for parameter tuning was proposed, to explore different combination of parameters that can produce optimum accuracy for the LCS system. However, it was soon realized that it is infeasible to do so as under current implementation each run of the LCS takes around 15 to 18 minutes to finish, meaning that GA would not be able to explore enough search space of the parameters given the limited time available.
+
+Instead, parameters tuning is done manully using an iterative approach. The process involves running the LCS system and observe the final accuracy on testing data with only one parameter changed at a time. This allows comparison between the effect on accuracy for one parameters on different values.
+
+After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration,Maximum Population Size,Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.
+
+Overall Maximum Number Of Iteration,Maximum Population Size and Initial Range Factor together has the biggest impact on the accuracy of the LCS system. The selection of those parameters also depends on the number of training sample. If the number of instances in the training sample is large, the number of iteration LCS should run needs to be increased as well.
 
 
 Reason why standard deviation and mean are used, what information they carry
