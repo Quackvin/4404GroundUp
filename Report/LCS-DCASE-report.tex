@@ -83,6 +83,7 @@
 
 
 \section{Introduction}
+
 Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so to take a new approach, Learning Classifier Systems (LCSs) were explored as an alternative means of training a classification model. LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing, an instance is classified based on a vote from the population. Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system’s feature extraction tool, with the first experimenting with a prebuilt LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs’ parameters and to determine the how well these systems are able to classify scenes based on acoustic features.
 
 
@@ -506,44 +507,88 @@ Where $exp_{min}$ is the initial minimum experience threshold (that will apply t
 
 \section{Results}
 
-\todo[inline]{Yiyang: feel free to mess around with the sub-headings under Results if you wish}
-
-
-
-
-\subsection{Environment Representations}
-
-Alternative feature processing investigated
-
+This section reports on the results of Experiment 2. Section~\ref{sec:paramTune} discusses the results of varying some of the LCS parameters discussed previously. Section~\ref{sec:subsets} describes the investigation of classification on subsets of the set of classes in the dataset.
 
 
 \subsection{Parameter Tuning}
+\label{sec:paramTune}
 
-%- Rate of learning (improvement in accuracy over time)
-%
-%- Overall results: pairwise, all classes at once (confusion matrices)
-%
-%
-%Theoretical analysis?
+The parameters of LCS has a significant impact upon the performance of the system. Initially a separate GA component specifically for parameter tuning was proposed, to explore different combination of parameters that can produce optimum accuracy for the LCS system. However, it was soon realized that it is infeasible to do so as under current implementation each run of the LCS takes around 15 to 18 minutes to finish, meaning that GA would not be able to explore enough search space of the parameters given the limited time available.
 
+Instead, parameters tuning is done manually using an iterative approach. The process involves running the LCS system and observe the final accuracy on testing data with only one parameter changed at a time. This allows comparison between the effect on accuracy for one parameters on different values. 
 
+After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration,Maximum Population Size,Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.  
 
-Reason why standard deviation and mean are used, what information they carry
+Overall Maximum Number Of Iteration,Maximum Population Size and Initial Range Factor together has the biggest impact on the accuracy of the LCS system. The selection of those parameters also depends on the number of training sample. If the number of instances in the training sample is large, the number of iteration LCS should run needs to be increased as well.
 
 
-Car and office confusion matrix
-Plot for std dev and mean (for car and office) to explain
-Car, office and city centre (with confusion and plots)
-Then add metro station and show results (worse) - explain why it is worse
-Show a classifier on a graph to show how it can match instances
-Overall accuracy (all 15 features)
+
+\subsection{Subsets of Classifications}
+\label{sec:subsets}
+
+First, the simplest case of classifying between only two classes of sound files was attempted. As shown in Figure~\todo{add ref}, the overall accuracy of the LCS system converged on around 97\% after 3,000 iterations. And as shown in the confusion matrix table, 97.4\% of testing instance belonging to car and office was correctly classified. The LCS was not able to make a decision for approximately 2\% of the testing instances.
+
+ONE FIGURE AND CONFUSION MATRIX
+
+\begin{table}[!htbp]
+	\centering
+	\caption{Two class confusion matrix}
+	\label{tab:conf2}
+	\begin{tabularx}{0.3\textwidth}{cc}
+		\toprule
+		\textbf{Quantity} & \textbf{Probability} \\ \midrule
+		0         &         0.04         \\
+		1         &         0.13         \\
+		2         &         0.21         \\
+		3         &         0.24         \\
+		4         &         0.18         \\
+		5         &         0.11         \\
+		$\ge$ 6      &         0.10         \\ \bottomrule
+	\end{tabularx}
+\end{table}
+
+
+
+Next the above experiment was extended by the addition the city centre data. The system converged on accuracy of 95\% at around 1,000 iterations, representing a decrease by 2\% relative to the previous testing result when only two classes were involved.
+
+It can be observed that the system has the best performance on classifying office, where 100\% of the testing instances were correctly classified. The accuracy of classification on car has been reduced down to 88.5\% from around 97\% in the previous test. 
+
+ONE FIGURE AND CONFUSION MATRIX
+
+
+
+
+FOUR
+
+The system converged on a much lower accuracy (80\%) when data from four classes were used. A noteworthy observation is that the introduction of an additional class has little impact to the classes beforehand, yet as it can been seen in the confusion matrix, 34.2\% of testing instance belonging to metro station was falsely classified as city centre.
+
+ONE FIGURE AND CONFUSION MATRIX
+
+
+
+ALL
+
+As shown in the previous three tests, as the number of classes in the testing data increases, the overall accuracy of the LCS system decreases. This is as expected as the introduction of more classes will inevitably introduce many noise to the classifiers as well.  When all the classes in the testing dataset were used, it was observed that the overall accuracy decreased to around 44\%. 
+
+
 
 
 \section{Discussion}
 
 
-Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS / DCASE CHALLENGE SUBMISSIONS]
+The LCS system demonstrated good classification accuracy when data of three classes are used. However, when class ``metro station'' is introduced, the accuracy was brought down to around 80\%. This could be interpreted by looking at the characteristic curve for different classes.
 
+
+Figure 1 is the average standard deviations for each mel band (attribute) across all instances in the dataset for class ``car'',''office'' and ``city centre'', while figure 2 is the average means for each mel band(attribute) across all instances for the same classes.  These two graphs represents the general trend of all instances belonging to those classes in the dataset.  As it can be observed, those three lines  in each of the figure are relatively distinct from each other, meaning that it is relatively easy for the LCS system to generate rules that can distinguish them from each other. 
+
+However, when class ``metro station'' are added in the dataset, as reflected in figures above, the lines are not as distinct as before. The curve of city centre and metro station follow a really similar trend, meaning that if the range covered by one classifier could potentially cover the curve for the other class as well. Therefore, it is not surprising that metro station has a 35\% chance of being falsely classified as city centre. 
+
+
+
+
+The figures above showcase the characteristics curve for all 16 classes. It is clear that the curve for many classes are clustered together, meaning that the classifiers in the LCS system have a very high chance of grouping the curve belonging to several classes into one set of rules. Thus the low accuracy of classifying 16 classes can be understood. 
+
+In general, the reduction of features means that a large proportion of information is thrown away. Given the fact that there are 80 attributes in a instance and each of them are continuous, the amount of training data (around 4,000) is insufficient for LCS to generate accurate rules to classify classes that has their characteristic curves clustered together as shown in the figures above. 
 
 
 
