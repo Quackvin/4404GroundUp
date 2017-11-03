@@ -82,8 +82,8 @@ def explore3(loadPop):
         log.logTestResult(a, b, parameterList)
 
 def main(loadPop):
-    testfile = './features/data_office_car_only_testing.txt'
-    trainingfile = './features/data_office_car_only_training.txt'
+    testfile = './features/data_office_car_city_forest_metro_testing.txt'
+    trainingfile = './features/data_office_car_city_forest_metro_training.txt'
 
     log_result_file = testfile.split('/')[-1].split('.')[0] + '_result.txt'
     log_error_file  = testfile.split('/')[-1].split('.')[0] + '_error.txt'
@@ -92,7 +92,7 @@ def main(loadPop):
 
     env = environment.Environment(trainingfile , testfile)
 
-    parameterList = [500, 100, 0.3, 0.4, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
+    parameterList = [10000, 2000, 0.3 , 0.5, 5, 30, 0.2, 55, 0.5, 0.02, 0.1, 0.1, 20, 0.9]
 
     lcs = lcsModule.LCS(parameterList, log)
     if loadPop:
@@ -157,14 +157,24 @@ def run(lcs, env ):
         for instance in env.instances:
 
             lcs.currIter += 1
-            if lcs.currIter % (lcs.maxNumberOfIteration/10) == 0:
-                 saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
-                 savePopulation(lcs.population, saveName)
-                 [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
-                 lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
-                 lcs.log.logTestResult(a, b, lcs.parameterList)
-                 lcs.population = []
-                 loadPopulation(lcs,saveName)
+            if lcs.currIter < 1000:
+                if lcs.currIter % (lcs.maxNumberOfIteration/100) == 0:
+                     saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+                     savePopulation(lcs.population, saveName)
+                     [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
+                     lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
+                     lcs.log.logTestResult(a, b, lcs.parameterList)
+                     lcs.population = []
+                     loadPopulation(lcs,saveName)
+            else:
+                if lcs.currIter % (lcs.maxNumberOfIteration/10) == 0:
+                     saveName = env.testing_file.split('.')[0] + 'classifierPopulation' + str(lcs.parameterList) + 'testing_at_' + str(lcs.currIter) + '.json'
+                     savePopulation(lcs.population, saveName)
+                     [a, b] = test( env.testing_file, lcs.parameterList, lcs.log, saveName)
+                     lcs.log.logMessage('\n---------------Testing at ' + str(lcs.currIter) + '\n')
+                     lcs.log.logTestResult(a, b, lcs.parameterList)
+                     lcs.population = []
+                     loadPopulation(lcs,saveName)
 
             matchSetSize = lcs.doMatching(instance)
 
