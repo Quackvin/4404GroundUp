@@ -229,13 +229,42 @@ in which the average means of each class are plotted on one graph and the averag
 
 
 
+<<<<<<< HEAD
 \section{Experiment 1: Baseline System}
+=======
+\section{Experiment 1:\\LCS Baseline System}
+>>>>>>> 6f9ae555460d7de6b442a5c4bab2bd2752e91bc8
 \label{sec:exp1}
 
-Preliminary investigation into LCSs built by others, led us to sourcing from a sample system hosted on GitHub titled \textit{eLCS}. This Michigan-style classifier was developed as an educational tool which assisted with demonstrating the intricacies and components that contribute towards building a typical LCS. Five demo folders are utilized to show the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population is provided to run the LCS. The last folder in this system, titled \textit{‘Demo 5’} was utilized as a starting point for our baseline system.
+An investigation into LCSs built by others led us to sourcing from a sample system hosted on GitHub titled eLCS [?]. This Michigan-style classifier created by R. J. Urbanowicz [?] was developed as an educational tool that demonstrated the intricacies and components that contribute towards building a typical LCS. It consists of five demo folders showing the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population to run the LCS. For our purposes, we used the last folder ‘Demo 5’ as the starting point for constructing our LCS. This was used for the initialisation of the Github repository used for this experiment [?].
 
+Preliminary steps towards understanding the functional processes of this LCS included refactoring and inserting comments while stepping through the code using a debugging process. From this it was discovered early in the process that the LCS had support for continuous values for attributes and could be initialised without a predefined rule population. These features which were not apparent during our project introduction presentati, greatly simplified the process of adapting our dataset to work with this implementation of an LCS. Other results from these works included: refactoring the LCS code to a submodule, creation of a ‘utils’ directory for preprocessing of feature files, creation of a ‘notebooks’ directory for visualising the results and a ‘docs’ directory for holding compiled documentation files. PDF generated documentation can be found at the root level of the repository.
 
+In order to utilize the dataset processed by the libROSA library in the DCASE baseline solution, further processing of this dataset needed to take place to make it suitable for our implementation. As the dataset was too large for importation into our LCS model, the first approach was to reduce its dimensionality by calculating the mean and standard deviation over the time series data. When calculated over the entire range, it reduced the size of the dataset by a factor of 256:1. Other approaches included dividing the time series data into even slices and calculating the mean and standard deviation on these individual segments. After applying this process the dataset was then optionally split into training and testing datasets of varying ratios, ensuring that an even number of features were maintained in each dataset.
 
+\begin{table}
+	\caption{LCS Baseline models using Training data only}
+	\label{lcs-bs-models-tr}
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		Model & Segments & Population Size & Maximum Iterations \\ \hline
+		1 & 1 & 1,000 & 500,000 \\
+		2 & 8 & 1,000 & 500,000 \\
+		3 & 1 & 3,000 & 30,000 \\
+		3 & 1 & 5,000 & 50,000 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+For the first series of simulations the entire training dataset (4680 instances) was used to generate the rule population for feature prediction without any testing data. Although this results in a grossly overfit prediction model, it seeks to determine the performance of the LCS to generate rule populations that are able to correctly classify elements in the training dataset. The models generated in this section are listed in Table ??
+
+\todo[inline]{---bs-plot-1.png here---}
+
+Figure ?? shows a comparison of Models 1 and 2 in which we evaluate the rule population accuracy with an increase in the number of segments to the time series data. These simulations were also run for a large number of iterations to evaluate how accuracy changed with time. A comparison of these models has shown that a strong correlation between segmentation size and population rule accuracy. It also showed that running the model for an extended period of time had no bearing on increasing its accuracy. Model 1 was shown to have benefit from running up until approximately 100,000 iterations, while Model 2 had no benefit at all.
+
+\todo[inline]{---bs-plot-2.png here---}
+
+Figure ?? shows a comparison of Models 1, 3 and 4 in which we evaluate the rule population accuracy with an increase to the population size up to a maximum of 50,000 iterations. These results showed that a strong correlation existed between population size and population rule accuracy. It should be noted however that increasing the population size also resulted in a substantial increase to computation time.
 
 
 \section{Experiment 2: Custom LCS Implementation}
@@ -395,7 +424,14 @@ Our approach is good because it is more general (no need to construct statistica
 
 
 
-
+\section{Future Research}
+As previously discussed, quality of the results achieved by a machine learning system is highly dependent on the quality of the features used as input. While reducing the dimension of the data by taking the mean and standard deviation of the mel bands worked well for classification of a few different scenes, the classifier performed poorly when presented with more categories to discriminate. This behaviour indicates that the features used did not adequately capture the nuances separating different scenes and that representing the data in different ways may be beneficial to performance.
+It may be useful to do Fourier analysis in order to better represent the shape of a sound file’s magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn’t increase dimensionality too drastically. 
+The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems. 
+Smoothness of the different magnitude-mel band curves would be an interesting feature to look into using for future experiments. Features could potentially be derived from the location of maxima and minima as well as the smoothness between adjacent mel bands.
+There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in 
+\todo[inline]{flipItBoyo.png}
+Given time for further research, investigation into classification using the high dimensional data directly extracted using the DCASE Baseline system's feature extractor also has potential to yield better results. Retaining all of the time data would make classifiers in the LCS more prone to overfitting an instance, but increasing generality with a higher proportion of wildcards may be able to offset this while also allowing useful information to be exploited rather than lost. This would also require a larger training dataset in order to be properly tested, as more data points would be needed to describe the higher dimensional space.
 
 \bibliographystyle{IEEEtranN}
 \bibliography{IEEEabrv,References}
