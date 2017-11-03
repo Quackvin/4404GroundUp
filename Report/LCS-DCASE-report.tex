@@ -120,7 +120,7 @@ Sound classification, or machine listening, is seen as a promising research fiel
 
 The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long segments for the datasets \cite{DCASE2017asc}. Overall, 312 segments are provides for each context.
 
-A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel-band energies, as described in Section Section~\ref{sec:featExt} \cite{Mesaros2017}. 
+A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel band energies, as described in Section Section~\ref{sec:featExt} \cite{Mesaros2017}. 
 
 
 
@@ -146,26 +146,32 @@ The results of the 2017 DCASE Challenge show that the baseline solution provided
 \subsection{Feature Engineering}
 \label{sec:featEng}
 
-Feature engineering is a vital aspect of machine learning, as the way that data is presented to a predictive model has a large impact on the quality of results achieved \cite{Brownlee2014}. This is because features that don’t capture important information from the dataset effectively will not provide an accurate representation of the environment and may ignore useful patterns. Feature extraction is a method of deriving key information from a dataset into a useful format by using tools specific to the problem domain and typically results in a reduction in data dimensionality \cite{Howbert2012}. The “Curse of Dimensionality” is an important concept in the domain of machine learning that refers to the problem that as the dimensions of feature set increases, the volume of the feature space increases exponentially \cite{Keogh2010}. This has a particularly large impact on LCSs, as, with the exception of wildcards, the rule for every single feature is required to match with that of the instance to classify. To illustrate this, for a feature set of size 1000 and a classifier with 50\% wildcards, still 500 features from the environment instance would need to perfectly match the classifier’s corresponding rules and if even one of them does not, the instance will not be matched. One way to interpret this is that for a highly dimensional feature set each individual feature is insignificant \cite{Keogh2010}, but can have a large impact on the result.
+Feature engineering is a vital aspect of machine learning, as the way that data is presented to a predictive model has a large impact on the quality of results achieved \cite{Brownlee2014}. This is because features that don't capture important information from the dataset effectively will not provide an accurate representation of the environment and may ignore useful patterns. Feature extraction is a method of deriving key information from a dataset into a useful format by using tools specific to the problem domain, and typically results in a reduction in data dimensionality \cite{Howbert2012}.
+
+The ``Curse of Dimensionality'' is an important concept in the domain of machine learning that refers to the problem that as the dimensions of feature set increases, the volume of the feature space increases exponentially \cite{Keogh2010}. This has a particularly large impact on LCSs, as, with the exception of wildcards, the rule for every single feature is required to match with that of the instance to classify. To illustrate this, for a feature set of size 1000 and a classifier with 50\% wildcards, still 500 features from the environment instance would need to perfectly match the classifier's corresponding rules and if even one of them does not, the instance will not be matched. One way to interpret this is that for a high dimensional feature set, each individual feature is insignificant \cite{Keogh2010}, but can have a large impact on the result.
 
 For the application of acoustic scene classification, defining features need to be extracted from sound files, and these need to be reduced to a dimensionality suitable for use in LCS rules.
+
+
+
 
 \subsection{Feature Extraction}
 \label{sec:featExt}
 
-The mel scale is a scale of pitches that was designed to vary linearly with a listener’s perception of a sound and is used in the LCS for sound data representation. It is an informal unit of measure that can be converted to from the frequency spectrum by using a function derived from what listeners judge to be pitches of equal distance from each other \cite{Luening1975}. There are various ways of converting from Hz to mels and a common method uses the equation  \cite{OShaughnessy1987}, a plot of which can be seen in 
+The mel scale is a scale of pitches (sound frequencies) that was designed to vary linearly with a listener's perception of a sound and is used in the DCASE Challenge and the LCS used in this project for sound data representation. It is an informal unit of measure that can be converted to from the frequency spectrum by using a function derived from what listeners judge to be pitches of equal distance from each other \cite{Luening1975}. There are various ways of converting from Hz to mels and a common method uses the equation  \cite{OShaughnessy1987}, a plot of which can be seen in Figure~\ref{fig:hz2mel}.
 
-\todo[inline]{reference hz2mel.png}. 
+Acoustic classifiers often convert frequencies to the mel scale because of its characteristic of mimicking human perception, and due to its logarithmic transformation of the frequency spectrum, it also results in dimension reduction when using bands as features \cite{Stowell2014}.
 
-Acoustic classifiers often convert frequencies to the mel scale because its characteristic of mimicking human perception, and due to its logarithmic transformation of the frequency spectrum, it also results in dimension reduction when using bands as features \cite{Stowell2014}.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/hz2mel.png}
+	\caption{Conversion from frequency to mel scale}
+	\label{fig:hz2mel}
+\end{figure}
 
-\todo[inline]{--- hz2mel here ---}
+Initial feature extraction was done using the DCASE Challenge baseline system's included feature extractor, which makes use of python music and audio analysis package called LibROSA \cite{Heittola2017}. The feature extractor takes an audio file as an input and outputs an array in which each row is a time slice and each column is a feature, with the specifics dependent on a configurable parameters list. The parameters used can be seen in Table~\ref{tab:featExParam}.
 
-Initial feature extraction was done using the DCASE Baseline system’s included feature extractor, which makes use of python music and audio analysis package called LibROSA \cite{Heittola2017}. The feature extractor takes an audio file as an input and outputs an array in which each row is a time slice and each column is a feature, with the specifics dependent on a configurable parameters list. The parameters used can be seen in 
-
-\todo[inline]{reference parameters figure}. 
-
-Based on the settings used, the feature extractor output arrays with 501 time slices and 40 features, with each feature being the log of the magnitude of a band on the mel scale. This results in a feature set for each sound file of  dimensions.
+Based on the settings used, the feature extractor output arrays with 501 time slices and 40 features, with each feature being the log of the magnitude of a band on the mel scale. This results in a feature set for each sound file of 20,040 dimensions.
 
 \begin{table}
 	\centering
@@ -194,51 +200,141 @@ Based on the settings used, the feature extractor output arrays with 501 time sl
 \end{table}
 
 
+
+
 \subsection{Feature Reduction}
 \label{sec:featReduce}
 
-The feature set extracted using the baseline system has a very high dimension, and in that form would be unsuitable for use with an LCS, as a feature set of that size would cause increased processing time as well as classifiers that are overfitted to specific instances. In order to perform dimensionality reduction without losing too much important information about that datasets, some visualisations were made to allow visual inspection and identification of trends to potentially be exploited. Each of the graphs shown in 
-\todo[inline]{reference beachgrid.png, cargrid.png, officegrid.png} 
-show the features extracted for a given sound file, with 9 different sound files of a given classification displayed together. Each line represents one of the 501 time slices and the magnitude of each mel band in that slice. 
-\todo[inline]{---3 grids here in 1 figure---}
+The feature set extracted using the baseline system has a very high dimension, and in that form would be unsuitable for use with an LCS as a feature set of that size would cause increased processing time as well as classifiers that are overfitted to specific instances. In order to perform dimensionality reduction without losing too much important information about the datasets, some visualisations were made to facilitate identification of trends to potentially be exploited. Each of the graphs shown in Figure~\ref{fig:beachCarOffice} show the features extracted for a given sound file, with 9 different sound files of a given classification displayed together for the beach, car and office classifications. Each line represents one of the 501 time slices and the magnitude of each mel band in that slice. 
 
-Comparing these graphs, it is clear that there are patterns common to individual classifications and that in a given sound file, the distribution of mel band magnitudes follows a similar pattern for many of the time slices. Given this similarity between time slices, it was decided that the mean and standard deviation of each mel band magnitude across all time slices would be used as the feature set, as this reduces the dimensionality by 250 times while maintaining a measure of both the trend and spread of the data. The three example classes shown in 
-\todo[inline]{reference beachgrid.png, cargrid.png, officegrid.png} 
-are shown again in 
-\todo[inline]{reference beach.png, car.png, office.png}, 
-with the difference that each line represents the average log magnitude of for each mel band in one sound file of the class shown rather than each line being one time slice of a single file. These graphs illustrate that by taking the mean magnitude for each mel band, the general trends are preserved, and though the spreading of these values between time slices is not represented, it is captured in the standard deviations for each mel band. The average mean and standard per mel band across all sound files of each example classification is shown in 
-\todo[inline]{reference 3means.png, 3stds.png} and illustrates that the differences between classifications is still captured by the chosen features despite the dimension reduction.
-\todo[inline]{---3 graphs (beach car and office.png) here in 1 fig---}
-\todo[inline]{---2 graphs (3means and 3stds (lol)) in 1 fig---}
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.54\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/beachgrid.png}
+		\caption{Beach}
+	\end{subfigure}
+	\\
+	\vspace{0.2cm}
+	\begin{subfigure}[t]{0.54\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/cargrid.png}
+		\caption{Car}
+	\end{subfigure}
+	\\
+	\vspace{0.2cm}
+	\begin{subfigure}[t]{0.54\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/officegrid.png}
+		\caption{Office}
+	\end{subfigure}
+	\caption{Extracted features for beach, car and office sound files}
+	\label{fig:beachCarOffice}
+\end{figure}
 
-The amount of spread between different instances of each class observed in 
-\todo[inline]{reference beach.png, car.png, office.png}
-is noticeably large and would result in classifiers needing to have a large range of accepted values in order to catch many other instances of their classification. This spreading is potentially due to the sound files having different recorded volumes which may result in magnitude offset observed. In attempt to rectify this, the means were normalised such that in a given sound file, instead of using the means as features, the average across the means of each mel band was taken and the features used were the mel band means subtract the average mean. This method would make magnitude offset irrelevant while maintaining trends and is illustrated in 
-\todo[inline]{reference normalise.png} 
-with the results displayed in 
-\todo[inline]{reference beachVar.png, carVar.png, officeVar.png} 
-confirming that the general trends are preserved while reducing spread on the y axis. Unfortunately, upon testing this method was found to reduce classification accuracy so it was not used for further testing. Further analysis of the feature set showed that this is likely due to the offset of the mel band magnitudes being a defining characteristic of different scenes, which can be observed in 
-\todo[inline]{reference allMeans.png, allMeanVars.png} 
-in which the average means of each class are plotted on one graph and the average normalised means are plotted on another. The graph of average means shows that classes are distinct from one another based on their magnitude offset and the other shows that by normalising them this feature is lost. The reduction in accuracy may imply that either the difference in trend was not enough to make classes distinct from one another or potentially that more parameter tuning of the LCS would be needed to take advantage of the normalisation.
+Comparing these graphs, it is clear that there are patterns common to individual classifications and that in a given sound file, the distribution of mel band magnitudes follows a similar pattern for many of the time slices. Given this similarity between time slices, it was decided that the mean and standard deviation of each mel band magnitude across all time slices would be used as the feature set, as this reduces the dimensionality by a factor of 250 while maintaining a measure of both the trend and spread of the data.
 
-\todo[inline]{---normalise.png here---}
-\todo[inline]{---beachVar, carVar and officeVar.png here---}
-\todo[inline]{---allMeans and allMeanVars.png here---}
+The three example classes shown in Figure~\ref{fig:beachCarOffice} are shown again in Figure~\ref{fig:beachCarOfficeAvg} with the difference that each line represents the \textit{average} log magnitude of for each mel band in one sound file of the given class, rather than each line being one time slice of a single file. These graphs illustrate that by taking the mean magnitude for each mel band, the general trends are preserved, and though the spreading of these values between time slices is not represented, it is captured in the standard deviations for each mel band. The average mean and standard per mel band across all sound files of each example classification is shown in Figure~\ref{fig:avgAndStd} and illustrates that the differences between classifications is still captured by the chosen features despite the extreme dimension reduction.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/beach.png}
+		\caption{Beach}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/car.png}
+		\caption{Car}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/office.png}
+		\caption{Office}
+	\end{subfigure}
+	\caption{Average mel bands for each sound file in beach, car and office classifications}
+	\label{fig:beachCarOfficeAvg}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/3Means.png}
+		\caption{Means}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/3Stds.png}
+		\caption{Standard deviations}
+	\end{subfigure}
+	\caption{Average and standard deviation of sound file averaged mel bands across all sound files for a given classification}
+	\label{fig:avgAndStd}
+\end{figure}
+
+The amount of spread between different instances of each class observed in Figure~\ref{fig:beachCarOfficeAvg} is noticeably large and would result in classifiers needing to have a large range of accepted values in order to catch many other instances of their classification. This spreading is potentially due to the sound files having different recorded volumes which may result in the magnitude offsets observed.
+
+In attempting to rectify this, the means were normalised such that in a given sound file, instead of using the means as features, the average across the means of each mel band was taken and the features used were the mel band means subtract the average mean. This method would make magnitude offset irrelevant while maintaining trends and is illustrated in Figure~\ref{fig:norm} with the results of this transformation displayed in Figure~\ref{fig:beachCarOfficeVar} confirming that the general trends are preserved while reducing spread on the y axis.
+
+Unfortunately, upon testing, this method was found to reduce classification accuracy so it was discontinued. Further analysis of the feature set showed that this is likely due to the offset of the mel band magnitudes being a defining characteristic of different scenes, which can be observed in Figure~\ref{fig:cmpOrigAndNorm} in which the average means of each class are plotted on one graph and the average normalised means are plotted on another. The graph of average means shows that classes are distinct from one another based on their magnitude offset and the other shows that by normalising them this discrimination is lost. The reduction in accuracy may imply that either the difference in trend was not enough to make classes distinct from one another or potentially that more parameter tuning of the LCS would be needed to take advantage of the normalisation.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/normalise.png}
+	\caption{Normalisation procedure for feature data}
+	\label{fig:norm}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/beachVar.png}
+		\caption{Beach}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/carVar.png}
+		\caption{Car}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/officeVar.png}
+		\caption{Office}
+	\end{subfigure}
+	\caption{Normalised mean mel band values for each sound file in each classification shown}
+	\label{fig:beachCarOfficeVar}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/allMeans.png}
+		\caption{Means}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.9\textwidth]{figures/allMeanVars.png}
+		\caption{Standard deviations}
+	\end{subfigure}
+	\caption{Comparison of original and normalised mel band averages across each classification}
+	\label{fig:cmpOrigAndNorm}
+\end{figure}
 
 
 
 
 
-<<<<<<< HEAD
+
+
 \section{Experiment 1: Baseline System}
-=======
-\section{Experiment 1:\\LCS Baseline System}
->>>>>>> 6f9ae555460d7de6b442a5c4bab2bd2752e91bc8
 \label{sec:exp1}
 
-An investigation into LCSs built by others led us to sourcing from a sample system hosted on GitHub titled eLCS [?]. This Michigan-style classifier created by R. J. Urbanowicz [?] was developed as an educational tool that demonstrated the intricacies and components that contribute towards building a typical LCS. It consists of five demo folders showing the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population to run the LCS. For our purposes, we used the last folder ‘Demo 5’ as the starting point for constructing our LCS. This was used for the initialisation of the Github repository used for this experiment [?].
+An investigation into LCSs built by others led us to sourcing from a sample system hosted on GitHub titled eLCS [?]. This Michigan-style classifier created by R. J. Urbanowicz [?] was developed as an educational tool that demonstrated the intricacies and components that contribute towards building a typical LCS. It consists of five demo folders showing the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population to run the LCS. For our purposes, we used the last folder `Demo 5' as the starting point for constructing our LCS. This was used for the initialisation of the Github repository used for this experiment [?].
 
-Preliminary steps towards understanding the functional processes of this LCS included refactoring and inserting comments while stepping through the code using a debugging process. From this it was discovered early in the process that the LCS had support for continuous values for attributes and could be initialised without a predefined rule population. These features which were not apparent during our project introduction presentati, greatly simplified the process of adapting our dataset to work with this implementation of an LCS. Other results from these works included: refactoring the LCS code to a submodule, creation of a ‘utils’ directory for preprocessing of feature files, creation of a ‘notebooks’ directory for visualising the results and a ‘docs’ directory for holding compiled documentation files. PDF generated documentation can be found at the root level of the repository.
+Preliminary steps towards understanding the functional processes of this LCS included refactoring and inserting comments while stepping through the code using a debugging process. From this it was discovered early in the process that the LCS had support for continuous values for attributes and could be initialised without a predefined rule population. These features which were not apparent during our project introduction presentati, greatly simplified the process of adapting our dataset to work with this implementation of an LCS. Other results from these works included: refactoring the LCS code to a submodule, creation of a `utils' directory for preprocessing of feature files, creation of a `notebooks' directory for visualising the results and a `docs' directory for holding compiled documentation files. PDF generated documentation can be found at the root level of the repository.
 
 In order to utilize the dataset processed by the libROSA library in the DCASE baseline solution, further processing of this dataset needed to take place to make it suitable for our implementation. As the dataset was too large for importation into our LCS model, the first approach was to reduce its dimensionality by calculating the mean and standard deviation over the time series data. When calculated over the entire range, it reduced the size of the dataset by a factor of 256:1. Other approaches included dividing the time series data into even slices and calculating the mean and standard deviation on these individual segments. After applying this process the dataset was then optionally split into training and testing datasets of varying ratios, ensuring that an even number of features were maintained in each dataset.
 
@@ -267,6 +363,7 @@ Figure ?? shows a comparison of Models 1 and 2 in which we evaluate the rule pop
 Figure ?? shows a comparison of Models 1, 3 and 4 in which we evaluate the rule population accuracy with an increase to the population size up to a maximum of 50,000 iterations. These results showed that a strong correlation existed between population size and population rule accuracy. It should be noted however that increasing the population size also resulted in a substantial increase to computation time.
 
 
+
 \section{Experiment 2: Custom LCS Implementation}
 \label{sec:exp2}
 
@@ -287,7 +384,7 @@ Continuous valued rules were implemented using the centre-range encoding \cite{S
 
 Additionally, the GA required a number of design decisions. These included the use of two-point crossover, roulette-wheel parent selection and employing GA subsumption (where parents can subsume children if they are more general). The GA was also applied in a `niched' manner to act only on the correct set. Niched GA operation has been noted as a significant contributor to LCS performance \cite{Lanzi2008}. Accuracy-based fitness, another key performance enhancing feature \cite{Lanzi2008}, was also used.
 
-As discussed in Section~\ref{sec:featReduce}, the mean and standard deviation of log mel-bands were used as the features for each sound file in this experiment. All 312 sound files from all of the 15 sound contexts were considered. That is, the LCS \textit{environment} consisted of 312 \textit{instances} (sound files) per \textit{endpoint} (context), giving a total of 4,680 instances, each containing 80 \textit{attributes} (features; 40 means, 40 standard deviations). Data was split into training and testing datasets with a 60:40 ratio.
+As discussed in Section~\ref{sec:featReduce}, the mean and standard deviation of log mel bands were used as the features for each sound file in this experiment. All 312 sound files from all of the 15 sound contexts were considered. That is, the LCS \textit{environment} consisted of 312 \textit{instances} (sound files) per \textit{endpoint} (context), giving a total of 4,680 instances, each containing 80 \textit{attributes} (features; 40 means, 40 standard deviations). Data was split into training and testing datasets with a 60:40 ratio.
 
 
 
@@ -425,8 +522,9 @@ Our approach is good because it is more general (no need to construct statistica
 
 
 \section{Future Research}
+
 As previously discussed, quality of the results achieved by a machine learning system is highly dependent on the quality of the features used as input. While reducing the dimension of the data by taking the mean and standard deviation of the mel bands worked well for classification of a few different scenes, the classifier performed poorly when presented with more categories to discriminate. This behaviour indicates that the features used did not adequately capture the nuances separating different scenes and that representing the data in different ways may be beneficial to performance.
-It may be useful to do Fourier analysis in order to better represent the shape of a sound file’s magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn’t increase dimensionality too drastically. 
+It may be useful to do Fourier analysis in order to better represent the shape of a sound file's magnitude-mel band curve, as the shape appears to be a distinctive feature for many of the instances. While this could be useful, more research would be needed to determine a means of representing a Fourier series in a way that doesn't increase dimensionality too drastically. 
 The DCASE Baseline system provides numerous different ways of extracting features from sounds files, so another avenue of future research would be to test the performance of different types of features extractable with the system. Potential experiments could be conducted into making use of mel scale cepstral coefficients rather than pure mel scale band data as well as experimenting with different window lengths, hop lengths and mel band sizes. A neural network or genetic algorithm could be used to optimise the feature extraction as well as LCS parameters in order to find the optimal settings across both systems. 
 Smoothness of the different magnitude-mel band curves would be an interesting feature to look into using for future experiments. Features could potentially be derived from the location of maxima and minima as well as the smoothness between adjacent mel bands.
 There might also be potential for research into swapping the data and plotting the magnitude over time of each mel band. Upon inspection, patterns do not immediately emerge as with magnitude over mel band of each time slice, but further research may find significant features to be extracted from that data. Example plots of magnitude over time for different mel bands can been seen in 
