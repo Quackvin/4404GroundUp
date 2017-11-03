@@ -117,9 +117,9 @@ A key distinction amongst LCS applications is between supervised learning, in wh
 \subsection{DCASE Challenge}
 \label{sec:DCASE}
 
-Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension \cite{Mesaros2017,DCASE2017asc}.
+Sound classification, or machine listening, is seen as a promising research field with wide-ranging applications \cite{Mesaros2017}. The DCASE challenge has been established to encourage and support work in this space. The challenge provided participants with standard development (training) and evaluation (testing) datasets \cite{Mesaros2016} and a baseline system for comparison and/or extension~\cite{Mesaros2017,DCASE2017asc}.
 
-The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long files for the datasets \cite{DCASE2017asc}. 
+The Challenge spans four sound recognition tasks: acoustic scene classification, detection of rare sound events, sound event detection in real life audio and large-scale weakly supervised sound event detection \cite{Mesaros2017}. This paper focuses on acoustic scene classification. For this task, the Challenge provides datasets containing sound files obtained across 15 different contexts, such as in a car, library or office \cite{DCASE2017asc}. Each sound file in 3-5 minutes long natively, but was split into multiple 10~second long segments for the datasets \cite{DCASE2017asc}. Overall, 312 segments are provides for each context.
 
 A baseline system for this task is provided in Python and uses a neural network with two hidden layers of 50 neurons each to classify sound files \cite{Mesaros2017}. The baseline system also provides support for extracting features from the datasets using what is known as log mel-band energies, as described in Section \todo[inline]{Add reference to Kevin's section} \cite{Mesaros2017}. 
 
@@ -132,7 +132,7 @@ A baseline system for this task is provided in Python and uses a neural network 
 
 The first task of the 2017 DCASE Challenge, and the focus of this paper, is acoustic scene classification. \citeauthor{Barchiesi2015} define this as ``the task of associating a semantic label to an audio stream that identifies the environment in which it has been produced'' \cite[p.~17]{Barchiesi2015}. Potential applications in this domain revolve around context aware smart devices, such as smartphones and hearing aids, that adjust their functioning based on the environments in which they find themselves \cite{Barchiesi2015}. 
 
-The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18-19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
+The typical approach taken to acoustic scene classification is to segment the original sound file into many, small `frames', calculate a set of features over each frame, use the resulting feature array to train a statistical model and finally apply some decision rule for assigning classification labels \cite[pp.~18--19]{Barchiesi2015}. Many approaches submitted to the 2017 DCASE challenge trained some form of neural network as their `statistical model' \cite{DCASE2017asc}.
 
 The results of the 2017 DCASE Challenge show that the baseline solution provided achieved an accuracy of 74.8\% on the development dataset and 61.0\% on the evaluation set averaged across all sound classifications \cite{DCASE2017asc}. Many entrants successfully outperformed the baseline on both the development and evaluation datasets; however, all algorithms performed worse on the evaluation set compared to the development set \cite{DCASE2017asc}. The best performing solution achieved an accuracy of 87.1\% and 83.3\% on the development and evaluation datasets, respectively \cite{DCASE2017asc,Mun2017}.
 
@@ -143,21 +143,14 @@ The results of the 2017 DCASE Challenge show that the baseline solution provided
 
 \section{Feature Extraction}
 
-[KEVIN'S SECTION]
+\todo[inline]{Import Kevin's section}
 
 
 
-\section{Experiments}
-\label{sec:exp}
-
-Data breakdown
-
-Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS]
 
 
-
-\subsection{LCS Baseline System}
-\label{sec:ryan}
+\section{Experiment 1:\\Baseline System}
+\label{sec:exp1}
 
 Preliminary investigation into LCSs built by others, led us to sourcing from a sample system hosted on GitHub titled \textit{eLCS}. This Michigan-style classifier was developed as an educational tool which assisted with demonstrating the intricacies and components that contribute towards building a typical LCS. Five demo folders are utilized to show the steps towards building a typical LCS and a dataset consisting of discrete attributes and a starting rule population is provided to run the LCS. The last folder in this system, titled \textit{‘Demo 5’} was utilized as a starting point for our baseline system.
 
@@ -165,25 +158,49 @@ Preliminary investigation into LCSs built by others, led us to sourcing from a s
 
 
 
-\section{Experiment 2: Adapted XCS(R) Design}
-\label{sec:home}
+\section{Experiment 2:\\XCSR Implementation}
+\label{sec:exp2}
 
-Details of the LCS we made, specific design changes relative to the standard 
-implementation for our problem
+In response to the positive results obtained from the baseline system described above, a separate LCS algorithm was coded by the authors. This provided much greater ability to control various aspects of the algorithm and more clarity as to the overall system's functioning. This section presents the general approach to developing this algorithm (Section~\ref{sec:exp2appr}), a description of each of the key parameters (Section~\ref{sec:exp2params}) and the key modifications made to the standard LCS design (Section~\ref{sec:exp2mods}).
+
+
+
 
 
 \subsection{Overview of Approach}
+\label{sec:exp2appr}
+
+The LCS algorithm developed by the authors was closely based on the structure and pseudocode provided by \citeauthor{Butz2000} in their paper entitled ``An Algorithmic Description of LCS'' \cite{Butz2000}. This paper provides detailed descriptions for each of the key modules within XCS, which is one of the most well-used LCS implementations \cite{Sigaud2007}. The decision to embark on developing our own LCS was largely based on the availability of the pseudocode in this paper.
+
+Two fundamental changes made to the algorithm presented by \citeauthor{Butz2000} were the change to continuous data, and hence continuously-valued classifier rules, and the switch from reinforcement learning to offline learning. Both changes necessitated a significant number of alterations throughout the algorithm. Various papers were consulted for how to make these changes. In particular, a number of papers on XCSR -- the standard continuous version of XCS -- were used \cite{Sowden2007,Stone2003,Wilson2000,Behdad2012}.
+
+The GA required a number of additional design decisions. These included the use of two-point crossover, roulette-wheel selection of parents and employing GA subsumption (parents can subsume children if more general). The GA was also applied in a `niched' manner, acting only on the correct set. Niched GA operation has been noted as a significant contributor to LCS performance \cite{Lanzi2008}. Accuracy-based fitness, another key contributor to LCS performance \cite{Lanzi2008}, was also used.
+
+As discussed in Section\todo[inline]{Add reference to Kevin's section}, the mean and standard deviation of log mel-bands were used as the features for this experiment. All 312 sound files from all of the 15 sound contexts were considered. That is, the LCS \textit{environment} consisted of 312 instances (sound files) per endpoint (context), giving a total of 4,680 instances, each containing 80 attributes (features; 40 means, 40 standard deviations). Data was split into training and testing datasets with a 60:40 ratio.
+
+
+
 
 
 
 
 \subsection{Parameters}
+\label{sec:exp2params}
 
+\todo[inline]{Import Yiyang's section}
 
 
 \subsection{Problem-Specific Modifications}
+\label{sec:exp2mods}
 
 
+Mutation scheme (plus note on probabilities: Sometimes a child will just be copies of their parents: P(no crossover) = 0.3, P(no mutation) = (0.98))
+
+Correct set subsumption -- criteria for most general classifier determined as most wildcards or equal most and largest range
+
+Subsumption conditions -- tolerance and removed wildcard criteria
+
+Deletion experience threshold -- changed deletion criteria so that classifiers with little utility (low match count) can be deleted, motivation was the really low average match count -- show graph of function
 
 {\small \[
 \frac{exp_{min}}{3.05}
@@ -193,22 +210,15 @@ implementation for our problem
 
 
 
-%- Feature Extraction, motivation for feature choices (i.e. feautres don't vary a lot across a file (low standard deviation), need to reduce the number of features)
-%
-%- Description of the code (the one we made outselved and Urbaonwicz's)
-%
-%- Parameters used
-%
-%Structure and design of algorithm: generic XCS modified for continuous data and offline learning
-%
-%Key modifications to basic LCs: (1) added tolerance to subsumption and removed wildcard criteria so that subsumption has some likelihood of occurring, (2) changed deletion criteria so that classifiers with little utility (low match count) can be deleted, motivation was the really low average match count, (3) action set subsumption criteria for most general classifier determined as most wildcards or equal most and largest range, (4) ...
-%
-%Show graph of function for deletion experience threshold (developed in response to \#2)
 
 
 
 
 \section{Results}
+
+\todo[inline]{Yiyang: feel free to mess around with the sub-headings under Results if you wish}
+
+
 
 
 \subsection{Environment Representations}
@@ -231,19 +241,20 @@ Alternative feature processing investigated
 Reason why standard deviation and mean are used, what information they carry
 
 
-
-
-\section{Discussion}
-
-
-
-
 Car and office confusion matrix
 Plot for std dev and mean (for car and office) to explain
 Car, office and city centre (with confusion and plots)
 Then add metro station and show results (worse) - explain why it is worse
 Show a classifier on a graph to show how it can match instances
 Overall accuracy (all 15 features)
+
+
+\section{Discussion}
+
+
+Our approach is good because it is more general (no need to construct statistical models or decision rules) and significantly reduces the number of features that need to be analysed, and therefore the complexity of the algorithm. [THIS IS COMPARING TO STANDARD APPROACH TO ACS / DCASE CHALLENGE SUBMISSIONS]
+
+
 
 
 

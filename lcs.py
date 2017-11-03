@@ -85,7 +85,6 @@ class LCS:
         self.matchSet = incorrectSet  # matchSet currently is only consisting of incorrectSet, but the left over correct set will be added back later
 
 
-    # using currIter to give the classifier a number ID????
     def doCovering(self, instance):
         outcome = instance.outcome
         rules = classifierModule.Rules()
@@ -158,7 +157,6 @@ class LCS:
                     self.population.pop(i)
                 break
 
-    #make sure testing is deleting unfit classifiers
     def deletionVote(self, classifier, popAveFitness):
         vote = classifier.aveMatchSetSize * classifier.numerosity
         if classifier.matchCount > self.deletionThreshold*self.scaleDeletionThreshold(self.currIter-classifier.birthIteration) \
@@ -204,7 +202,6 @@ class LCS:
         return (math.pi/2 - math.atan((age-ageThresh)/20))/3.05
 
 
-#########################################################################
 
     # TASK: description
     #
@@ -218,9 +215,6 @@ class LCS:
     # Called by main
     #
     def GA(self, instanceFeatures):
-
-        # TASK: check average time since last GA iteration, run if above threshold
-
         # Update last GA iteration for all classifiers in correct set
         self.updateLastGAIterations()
 
@@ -298,6 +292,7 @@ class LCS:
         for classifier in self.correctSet:
             classifier.lastGAIteration = self.currIter
 
+
     # selectParents
     # Called by GA
     # Select two parents classifiers for GA from correct set using Roulette-Wheel Selection.
@@ -374,17 +369,12 @@ class LCS:
     # Note: crossover is limited to occur only between components of the rule, not between
     # alleles. That is, the crossover point will never be between a centre and its corresponding
     # range value. The crossover point will never split a (centre, range) pair.
-    #
-    # ENHACEMENT-: add option for single point crossover
-    # TASK: averaging of child parameters, weighted average based on the amount crossed over This
-    # would be an improvement compared to Butz & Wilson
     def doCrossover(self, childA, childB):
         n_conditions = len(childA.rules.centres)	# number of components in a classifier rule
         x = random.random()*n_conditions			# continuous implementation has two alleles per component
         y = random.random()*n_conditions
         if x > y:
-            # x is the smaller value
-            x, y = y, x
+            x, y = y, x     # x is the smaller value
 
         i = 0
         while i < y:
@@ -408,7 +398,7 @@ class LCS:
     # 2. Non-wildcard to wildcard: performed with probability probabilityWildcardMutation
     # 3. Wildcard to non-wildcard: similar to Stone & Bull (2003), this is performed by
     #	 initialising the rule (centre and range) based on the current environment instance.
-    #	 The centre value is calculated by multilying the instance value by a random factor
+    #	 The centre value is calculated by multiplying the instance value by a random factor
     #	 close to 1. range is calculated as initialRangeFactor times the centre value.
     def doMutation(self, child, instanceFeatures):
         # Mutation of rule centre values
@@ -425,10 +415,7 @@ class LCS:
                 # Non-wildcard to non-wildcard
                 else:
                     child.rules.centres[i] += self.mutationScale * random.uniform(-1,1)
-                ###############################
-                # KEVIN: Should a range be added on here? (use abs() so range is always positive)
-                ###############################
-
+                
         # Mutation of rule range values
         for i in range(0,len(child.rules.ranges)):
             # Mutate allele stochastically
@@ -497,7 +484,8 @@ class LCS:
     def isMoreGeneral(self, subsumer, subsumee):
         for i in range(0, len(subsumer.rules.centres)):
             # If the subsumee has a wildcard that the subsumer does not, return False
-            if subsumee.rules.centres[i] == '#' and subsumer.rules.centres[i] == '#':
+            # EDIT: This condition has been removed since it was prohibitively restrictive
+            if subsumee.rules.centres[i] == '#' or subsumer.rules.centres[i] == '#':
                 continue
                 #return False
             # If neither has a wildcard, check upper and lower bounds
