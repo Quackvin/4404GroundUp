@@ -13,7 +13,7 @@
 \usepackage{booktabs}				% nice table borders
 \usepackage{tabularx}				% equal width table columns
 \usepackage[hidelinks]{hyperref} 	% puts click-able links in the text, fixes issue with urls that have underscores
-\usepackage[defaultlines=2,all]{nowidow}	% prevents orphan and widow lines at start and end of paragraphs
+\usepackage[defaultlines=3,all]{nowidow}	% prevents orphan and widow lines at start and end of paragraphs
 \usepackage{multicol}				% control over using multiple columns
 \usepackage{lipsum}					% dummy text
 
@@ -83,9 +83,7 @@
 
 
 \section{Introduction}
-
-
-\todo[inline]{Write introduction}
+Every year there is an event held called the Detection and Classification of Acoustic Scenes and Events (DCASE) challenge, which sets a number of sound related tasks for competitors to complete. By running the event annually and allowing access to past solutions to be freely accessed, competitors are able push the boundaries of machine sound perception and continuously improve on past models. The vast majority of entrants to the competition use neural networks to train models, so to take a new approach, Learning Classifier Systems (LCSs) were explored as an alternative means of training a classification model. LCSs function by maintaining a population of classifiers that is continuously updated using various methods. These include the application of a genetic algorithm to breed classifiers with high fitness and a subsumption mechanism to pressure them into being more general. The population of classifiers is the predictive model that LCSs produce and when testing, an instance is classified based on a vote from the population. Two primary experiments were undertaken to test the appropriateness of LCSs for the DCASE acoustic scene classification task. Both of these approaches made used of a feature set created by reducing the dimensionality of the features output by the DCASE Baseline system’s feature extraction tool, with the first experimenting with a prebuilt LCS and the second building an LCS from the ground up. Various experiments were performed on both systems to optimise the LCSs’ parameters and to determine the how well these systems are able to classify scenes based on acoustic features.
 
 
 
@@ -328,7 +326,7 @@ Unfortunately, upon testing, this method was found to reduce classification accu
 
 
 
-
+\pagebreak
 \section{Experiment 1: Baseline System}
 \label{sec:exp1}
 
@@ -338,32 +336,48 @@ Preliminary steps towards understanding the functional processes of this LCS inc
 
 In order to utilize the dataset processed by the libROSA library in the DCASE baseline solution, further processing of this dataset needed to take place to make it suitable for our implementation. As the dataset was too large for importation into our LCS model, the first approach was to reduce its dimensionality by calculating the mean and standard deviation over the time series data. When calculated over the entire range, it reduced the size of the dataset by a factor of 256:1. Other approaches included dividing the time series data into even slices and calculating the mean and standard deviation on these individual segments. After applying this process the dataset was then optionally split into training and testing datasets of varying ratios, ensuring that an even number of features were maintained in each dataset.
 
-\begin{table}
-	\caption{LCS Baseline models using Training data only}
+\begin{table}[!htbp]
+	\centering
+	\caption{LCS Baseline models using training data only}
 	\label{lcs-bs-models-tr}
-	\begin{tabular}{|l|l|l|l|}
-		\hline
-		Model & Segments & Population Size & Maximum Iterations \\ \hline
-		1 & 1 & 1,000 & 500,000 \\
-		2 & 8 & 1,000 & 500,000 \\
-		3 & 1 & 3,000 & 30,000 \\
-		3 & 1 & 5,000 & 50,000 \\
-		\hline
-	\end{tabular}
+	\begin{tabularx}{0.7\textwidth}{cccc}
+		\toprule
+		\textbf{Model} & \textbf{Segments} & \textbf{Population size} & \textbf{Maximum iterations} \\ \midrule
+		      1        &         1         & 1,000                    & 500,000                     \\
+		      2        &         8         & 1,000                    & 500,000                     \\
+		      3        &         1         & 3,000                    & 30,000                      \\
+		      4        &         1         & 5,000                    & 50,000                      \\ \bottomrule
+		               &                   &                          &
+	\end{tabularx}
 \end{table}
 
-For the first series of simulations the entire training dataset (4680 instances) was used to generate the rule population for feature prediction without any testing data. Although this results in a grossly overfit prediction model, it seeks to determine the performance of the LCS to generate rule populations that are able to correctly classify elements in the training dataset. The models generated in this section are listed in Table ??
 
-\todo[inline]{---bs-plot-1.png here---}
+For the first series of simulations the entire training dataset (4680 instances) was used to generate the rule population for feature prediction without any testing data. Although this results in a grossly overfit prediction model, it seeks to determine the performance of the LCS to generate rule populations that are able to correctly classify elements in the training dataset. The models generated in this section are listed in Table~\ref{lcs-bs-models-tr}.
 
-Figure ?? shows a comparison of Models 1 and 2 in which we evaluate the rule population accuracy with an increase in the number of segments to the time series data. These simulations were also run for a large number of iterations to evaluate how accuracy changed with time. A comparison of these models has shown that a strong correlation between segmentation size and population rule accuracy. It also showed that running the model for an extended period of time had no bearing on increasing its accuracy. Model 1 was shown to have benefit from running up until approximately 100,000 iterations, while Model 2 had no benefit at all.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/bs-plot-1.png}
+	\caption{Comparison of LCS performance for Model 1 and 2}
+	\label{fig:diffSegment}
+\end{figure}
 
-\todo[inline]{---bs-plot-2.png here---}
+Figure~\ref{fig:diffSegment} shows a comparison of Models 1 and 2 in which we evaluate the rule population accuracy with an increase in the number of segments to the time series data. These simulations were also run for a large number of iterations to evaluate how accuracy changed with time. A comparison of these models has shown that a strong correlation between segmentation size and population rule accuracy. It also showed that running the model for an extended period of time had no bearing on increasing its accuracy. Model 1 was shown to have benefit from running up until approximately 100,000 iterations, while Model 2 had no benefit at all from running many iterations.
 
-Figure ?? shows a comparison of Models 1, 3 and 4 in which we evaluate the rule population accuracy with an increase to the population size up to a maximum of 50,000 iterations. These results showed that a strong correlation existed between population size and population rule accuracy. It should be noted however that increasing the population size also resulted in a substantial increase to computation time.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/bs-plot-2.png}
+	\caption{Comparison of LCS performance with different population sizes}
+	\label{fig:diffPopSize}
+\end{figure}
+
+Figure~\ref{fig:diffPopSize} shows a comparison of Models 1, 3 and 4 in which we evaluate the rule population accuracy with an increase to the population size up to a maximum of 50,000 iterations. These results showed that a strong correlation existed between population size and population rule accuracy. It should be noted however that increasing the population size also resulted in a substantial increase to computation time.
 
 
 
+
+
+
+\pagebreak
 \section{Experiment 2: Custom LCS Implementation}
 \label{sec:exp2}
 
@@ -395,7 +409,29 @@ As discussed in Section~\ref{sec:featReduce}, the mean and standard deviation of
 \subsection{Parameters}
 \label{sec:exp2params}
 
-\todo[inline]{Import Yiyang's section}
+The behaviour of LCS is controlled by a total of 14 parameters. These parameters are in direct relationship to the overall accuracy of the system. The list below provides a brief explanation of the function of each of the parameters.
+
+\begin{enumerate}
+	\itemsep0em
+	\item \textbf{Maximum Number of Iteration}: This number determines how many iteration the LCS system will run through the data set. The system will stop once its iteration count has reached this number.
+	\item \textbf{Maximum Population Size}: This number controls the size of the number of classifiers allowed to reside in the    population. Once the numbers of classifiers discovered by LCS system reached this threshold, deletion will occur. A low value on this parameters results in frequent deletion, which in turn allows more general rules to survive.
+	\item \textbf{Covering Wildcard Probability}: This parameter applies to the covering stage of the learning process. It specifies the probability of each attribute of a given instance being casted into a wildcard, meaning that this newly generated rule will disregard the value of this attribute in its decision making. A large number on this parameters tends to generate more general rules, as it is more prone to ignore an attributes value in deciding on an action. 
+	\item \textbf{Initial Range Factor}: This parameter also controls the behaviours of LCS in covering stage. As discussed in the previous section. If an attribute is not casted into a wildcard, then the rule generated through covering will set the centre of this attribute to be the current value, and its range will be determined by multiplying its current value with the initial range factor. A large value will generated rules covering a large spectrum of the dataset.  
+	\item \textbf{Power Parameter}:	This value is used to convert a classifier's accuracy to fitness, which is needed in the GA subsystem. Fitness of a classifier is calculated using the following formula:	$Fitness = (Accuracy)^{Power Parameter}$. This value is typical set as 5. Other values were also investigated to observe the effect.
+	\item \textbf{Deletion Threshold}: A classifier is considered as a potential candidate for deletion when its experience i.e the number of times this classifier has been matched by an instance is above this threshold. 
+	\item \textbf{Deletion Fitness Scale}: A classifier is also considered as a potential candidate for deletion when its fitness it below a percentage of the average fitness of the entire population. This percentage is controlled by this deletion fitness sacle parameter. 
+	\item \textbf{GA Threshold}: This parameters controls the frequency of GA being run among the correct set of classifiers. The GA subsystem is only allowed to run when the average of iteration since last GA of all classifiers exceeds this threshold. A small number on this parameter will result in GA operating more frequently, will in turns leads to more rules being discovered and added in the population.  
+	\item \textbf{Probability Crossover}: The parameter specifies the probability a child will be generated from a crossover process in the GA subsystem. 
+	\item \textbf{Probability Allele Mutation}: The probability an attribute of a classifier undergo allele mutation.
+	\item \textbf{Probability Wildcard Mutation}: The probability an attribute of a classifier get casted into a wildcard.
+	\item \textbf{Mutation Scale}: This extent to which the centre and range of a classifier can be mutated.
+	\item \textbf{Subsume Exp Threshold}: The threshold the experience of a classifier need to exceed before it is allowed to subsume another classifier.
+	\item \textbf{Subsume Accuracy Threshold}: The threshold the accuracy of a classifier need to exceed before it is allowed to subsume another classifier.
+\end{enumerate}
+
+
+
+
 
 
 
@@ -525,9 +561,13 @@ There might also be potential for research into swapping the data and plotting t
 Given time for further research, investigation into classification using the high dimensional data directly extracted using the DCASE Baseline system's feature extractor also has potential to yield better results. Retaining all of the time data would make classifiers in the LCS more prone to overfitting an instance, but increasing generality with a higher proportion of wildcards may be able to offset this while also allowing useful information to be exploited rather than lost. This would also require a larger training dataset in order to be properly tested, as more data points would be needed to describe the higher dimensional space.
 
 \section{Conclusion}
-Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into useable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs’ struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
+
+Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into useable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
 
 
+
+
+\pagebreak
 \bibliographystyle{IEEEtranN}
 \bibliography{IEEEabrv,References}
 
