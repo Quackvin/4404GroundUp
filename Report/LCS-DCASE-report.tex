@@ -411,7 +411,29 @@ As discussed in Section~\ref{sec:featReduce}, the mean and standard deviation of
 \subsection{Parameters}
 \label{sec:exp2params}
 
-\todo[inline]{Import Yiyang's section}
+The behaviour of LCS is controlled by a total of 14 parameters. These parameters are in direct relationship to the overall accuracy of the system. The list below provides a brief explanation of the function of each of the parameters.
+
+\begin{enumerate}
+	\itemsep0em
+	\item \textbf{Maximum Number of Iteration}: This number determines how many iteration the LCS system will run through the data set. The system will stop once its iteration count has reached this number.
+	\item \textbf{Maximum Population Size}: This number controls the size of the number of classifiers allowed to reside in the    population. Once the numbers of classifiers discovered by LCS system reached this threshold, deletion will occur. A low value on this parameters results in frequent deletion, which in turn allows more general rules to survive.
+	\item \textbf{Covering Wildcard Probability}: This parameter applies to the covering stage of the learning process. It specifies the probability of each attribute of a given instance being casted into a wildcard, meaning that this newly generated rule will disregard the value of this attribute in its decision making. A large number on this parameters tends to generate more general rules, as it is more prone to ignore an attributes value in deciding on an action. 
+	\item \textbf{Initial Range Factor}: This parameter also controls the behaviours of LCS in covering stage. As discussed in the previous section. If an attribute is not casted into a wildcard, then the rule generated through covering will set the centre of this attribute to be the current value, and its range will be determined by multiplying its current value with the initial range factor. A large value will generated rules covering a large spectrum of the dataset.  
+	\item \textbf{Power Parameter}:	This value is used to convert a classifier's accuracy to fitness, which is needed in the GA subsystem. Fitness of a classifier is calculated using the following formula:	$Fitness = (Accuracy)^{Power Parameter}$. This value is typical set as 5. Other values were also investigated to observe the effect.
+	\item \textbf{Deletion Threshold}: A classifier is considered as a potential candidate for deletion when its experience i.e the number of times this classifier has been matched by an instance is above this threshold. 
+	\item \textbf{Deletion Fitness Scale}: A classifier is also considered as a potential candidate for deletion when its fitness it below a percentage of the average fitness of the entire population. This percentage is controlled by this deletion fitness sacle parameter. 
+	\item \textbf{GA Threshold}: This parameters controls the frequency of GA being run among the correct set of classifiers. The GA subsystem is only allowed to run when the average of iteration since last GA of all classifiers exceeds this threshold. A small number on this parameter will result in GA operating more frequently, will in turns leads to more rules being discovered and added in the population.  
+	\item \textbf{Probability Crossover}: The parameter specifies the probability a child will be generated from a crossover process in the GA subsystem. 
+	\item \textbf{Probability Allele Mutation}: The probability an attribute of a classifier undergo allele mutation.
+	\item \textbf{Probability Wildcard Mutation}: The probability an attribute of a classifier get casted into a wildcard.
+	\item \textbf{Mutation Scale}: This extent to which the centre and range of a classifier can be mutated.
+	\item \textbf{Subsume Exp Threshold}: The threshold the experience of a classifier need to exceed before it is allowed to subsume another classifier.
+	\item \textbf{Subsume Accuracy Threshold}: The threshold the accuracy of a classifier need to exceed before it is allowed to subsume another classifier.
+\end{enumerate}
+
+
+
+
 
 
 
@@ -542,7 +564,7 @@ Given time for further research, investigation into classification using the hig
 
 \section{Conclusion}
 
-Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into useable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs’ struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
+Acoustic sound classification is ongoing field of research in which machine learning techniques have recently been making fast progress. The annual Detection and Classification of Acoustic Scenes and Events (DCASE) challenge provides various sound related tasks for competitors to train models on in attempts to push the boundaries of machine sound recognition performance. The challenge provides a training data set of sound files as well as a Baseline system that performs feature extraction by decomposing audio data into useable features. Taking a different direction to the neural networks that are most commonly used in this competition, learning classifier systems (LCSs) were used to explore their suitability to the given task of acoustic scene classification. Using the feature extractor provided, a feature set comprised of the average magnitude for 40 mel bands over the sound files was used to train the LCSs. It was found that while the system would perform extremely well when discriminating between a small set a classes, performance declined steeply as the number of classes increased and the patterns characterising them become less distinctive. It is potentially due to the method of dimension reduction used that the LCSs struggled to discriminate between larger sets of classes, so further research is required to investigate alternative feature sets and matching LCS parameters settings that may allow the systems to achieve greater performance in this area.
 
 
 
