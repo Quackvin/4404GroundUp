@@ -1,8 +1,7 @@
 import lcs as lcsModule
 import classifier as classifierModule
-import environment, json
 import log as logModule
-import numpy as np
+import environment, json, time
 
 def main():
 	# Parameters: [numberOfTrainingIterations, maxPopulationSize,
@@ -26,8 +25,12 @@ def main():
 	# Name of population file to load, don't load if empty string
 	loadPopulationFile = ''
 
+	start = time.time()
+
 	train(trainingfile, parameterList, log, populationSaveFile, loadPopulationFile)
 	test(testfile, parameterList , log, populationSaveFile)
+
+	print('Time taken (s): ', time.time()-start)
 
 def train(trainingFile, parameterList, log, saveFile, loadPop):
 	# Load training instances from file
