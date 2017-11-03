@@ -126,11 +126,6 @@ The typical approach taken to acoustic scene classification is to segment the or
 
 The results of the 2017 DCASE Challenge show that the baseline solution provided achieved an accuracy of 74.8\% on the development dataset and 61.0\% on the evaluation set averaged across all sound classifications \cite{DCASE2017asc}. Many entrants successfully outperformed the baseline on both the development and evaluation datasets; however, all algorithms performed worse on the evaluation set compared to the development set \cite{DCASE2017asc}. The best performing solution achieved an accuracy of 87.1\% and 83.3\% on the development and evaluation datasets, respectively \cite{DCASE2017asc,Mun2017}.
 
-
-
-
-
-
 \section{Feature Extraction}
 \label{sec:feat}
 
@@ -143,15 +138,12 @@ The ``Curse of Dimensionality'' is an important concept in the domain of machine
 
 For the application of acoustic scene classification, defining features need to be extracted from sound files, and these need to be reduced to a dimensionality suitable for use in LCS rules.
 
-
-
-
 \subsection{Feature Extraction}
 \label{sec:featExt}
 
-The mel scale is a scale of pitches (sound frequencies) that was designed to vary linearly with a listener's perception of a sound and is used in the DCASE Challenge and the LCS used in this project for sound data representation. It is an informal unit of measure that can be converted to from the frequency spectrum by using a function derived from what listeners judge to be pitches of equal distance from each other \cite{Luening1975}. There are various ways of converting from Hz to mels and a common method uses the equation  \cite{OShaughnessy1987}, a plot of which can be seen in Figure~\ref{fig:hz2mel}.
+The mel scale is a scale of pitches (sound frequencies) that was designed to vary linearly with a listener's perception of a sound. It is used in the DCASE Challenge and the LCS used in this project for sound data representation. It is an informal unit of measure that can be converted to and from the frequency spectrum, by using a function derived from what listeners judge to be pitches of equal distance from each other \cite{Luening1975}. There are various ways of converting from Hz to mels and a common method uses the equation  \cite{OShaughnessy1987}, a plot of which can be seen in Figure~\ref{fig:hz2mel}.
 
-Acoustic classifiers often convert frequencies to the mel scale because of its characteristic of mimicking human perception, and due to its logarithmic transformation of the frequency spectrum, it also results in dimension reduction when using bands as features \cite{Stowell2014}.
+Acoustic classifiers often convert frequencies to the mel scale because of its characteristic which mimicks human perception, and due to its logarithmic transformation of the frequency spectrum. It also results in dimension reduction when using bands as features \cite{Stowell2014}.
 
 \begin{figure}[!htbp]
 	\centering
@@ -160,7 +152,7 @@ Acoustic classifiers often convert frequencies to the mel scale because of its c
 	\label{fig:hz2mel}
 \end{figure}
 
-Initial feature extraction was done using the DCASE Challenge baseline system's included feature extractor, which makes use of python music and audio analysis package called LibROSA \cite{Heittola2017}. The feature extractor takes an audio file as an input and outputs an array in which each row is a time slice and each column is a feature, with the specifics dependent on a configurable parameters list. The parameters used can be seen in Table~\ref{tab:featExParam}.
+Initial feature extraction was done using the DCASE challenge baseline system's included feature extractor, which makes use of the python music and audio analysis package called LibROSA \cite{Heittola2017}. The feature extractor takes an audio file as an input and outputs an array in which each row is a time slice and each column is a feature, with the specifics dependent on a configurable parameters list. The parameters used can be seen in Table~\ref{tab:featExParam}.
 
 Based on the settings used, the feature extractor output arrays with 501 time slices and 40 features, with each feature being the log of the magnitude of a band on the mel scale. This results in a feature set for each sound file of 20,040 dimensions.
 
@@ -365,20 +357,11 @@ Figure~\ref{fig:diffSegment} shows a comparison of Models 1 and 2 in which we ev
 
 Figure~\ref{fig:diffPopSize} shows a comparison of Models 1, 3 and 4 in which we evaluate the rule population accuracy with an increase to the population size up to a maximum of 50,000 iterations. These results showed that a strong correlation existed between population size and population rule accuracy. It should be noted however that increasing the population size also resulted in a substantial increase to computation time.
 
-
-
-
-
-
 \pagebreak
 \section{Experiment 2: Custom LCS Implementation}
 \label{sec:exp2}
 
 In response to the positive results obtained from the baseline system described above, a separate LCS algorithm was coded by the authors. This provided much greater ability to control various aspects of the algorithm and more clarity as to the overall system's functioning. This section presents the general approach to developing this algorithm (Section~\ref{sec:exp2appr}), a description of each of the key parameters (Section~\ref{sec:exp2params}) and the key modifications made to the standard LCS design (Section~\ref{sec:exp2mods}).
-
-
-
-
 
 \subsection{Overview of Approach}
 \label{sec:exp2appr}
@@ -393,12 +376,6 @@ Additionally, the GA required a number of design decisions. These included the u
 
 As discussed in Section~\ref{sec:featReduce}, the mean and standard deviation of log mel bands were used as the features for each sound file in this experiment. All 312 sound files from all of the 15 sound contexts were considered. That is, the LCS \textit{environment} consisted of 312 \textit{instances} (sound files) per \textit{endpoint} (context), giving a total of 4,680 instances, each containing 80 \textit{attributes} (features; 40 means, 40 standard deviations). Data was split into training and testing datasets with a 60:40 ratio.
 
-
-
-
-
-
-
 \subsection{Parameters}
 \label{sec:exp2params}
 
@@ -407,7 +384,7 @@ The behaviour of LCS is controlled by a total of 14 parameters. These parameters
 \begin{enumerate}
 	\itemsep0em
 	\item \textbf{Maximum Number of Iteration}: This number determines how many iteration the LCS system will run through the data set. The system will stop once its iteration count has reached this number.
-	\item \textbf{Maximum Population Size}: This number controls the size of the number of classifiers allowed to reside in the    population. Once the numbers of classifiers discovered by LCS system reached this threshold, deletion will occur. A low value on this parameters results in frequent deletion, which in turn allows more general rules to survive.
+	\item \textbf{Maximum Population Size}: This number controls the size of the number of classifiers allowed to reside in the population. Once the numbers of classifiers discovered by LCS system reached this threshold, deletion will occur. A low value on this parameters results in frequent deletion, which in turn allows more general rules to survive.
 	\item \textbf{Covering Wildcard Probability}: This parameter applies to the covering stage of the learning process. It specifies the probability of each attribute of a given instance being casted into a wildcard, meaning that this newly generated rule will disregard the value of this attribute in its decision making. A large number on this parameters tends to generate more general rules, as it is more prone to ignore an attributes value in deciding on an action.
 	\item \textbf{Initial Range Factor}: This parameter also controls the behaviours of LCS in covering stage. As discussed in the previous section. If an attribute is not casted into a wildcard, then the rule generated through covering will set the centre of this attribute to be the current value, and its range will be determined by multiplying its current value with the initial range factor. A large value will generated rules covering a large spectrum of the dataset.
 	\item \textbf{Power Parameter}:	This value is used to convert a classifier's accuracy to fitness, which is needed in the GA subsystem. Fitness of a classifier is calculated using the following formula:	$Fitness = (Accuracy)^{Power Parameter}$. This value is typical set as 5. Other values were also investigated to observe the effect.
@@ -509,9 +486,9 @@ The parameters of LCS has a significant impact upon the performance of the syste
 
 Instead, parameters tuning is done manually using an iterative approach. The process involves running the LCS system and observe the final accuracy on testing data with only one parameter changed at a time. This allows comparison between the effect on accuracy for one parameters on different values.
 
-After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration,Maximum Population Size,Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.
+After many trials and experiments, it is found out that out of all the 14 parameters needed to run LCS system, only a few of them have impact on the overall accuracy, namely Maximum Number Of Iteration, Maximum Population Size, Covering Wildcard Probability and Initial Range Factor. It is discovered that large number of population size alongside with a small value in initial range factor tend to produce good result, while a small number of population size and a big value in initial range factor can produce similar result. Also the mutation probability is found to have adverse effect on the accuracy when set to high(above 0.5), yet once it is below 0.1 it does not have an substantial influence on the performance.
 
-Overall Maximum Number Of Iteration,Maximum Population Size and Initial Range Factor together has the biggest impact on the accuracy of the LCS system. The selection of those parameters also depends on the number of training sample. If the number of instances in the training sample is large, the number of iteration LCS should run needs to be increased as well.
+Overall Maximum Number Of Iteration, Maximum Population Size and Initial Range Factor together has the biggest impact on the accuracy of the LCS system. The selection of those parameters also depends on the number of training sample. If the number of instances in the training sample is large, the number of iteration LCS should run needs to be increased as well.
 
 
 
@@ -588,7 +565,7 @@ The system converged on a much lower accuracy (80\%) when data from four classes
 		                       & \textbf{Car} & \textbf{Office} & \textbf{City Centre} & \textbf{Metro Station} & \textbf{Uncovered} \\ \midrule
 		\textbf{Car}           &     91.0     &       3.8       &          0           & 3.8                    &        1.3         \\
 		\textbf{Office}        &      0       &      96.1       &          0           & 1.3                    &         0          \\
-		\textbf{City Centre}   &      0       &       2.7       &         88.5         & 7.7                    &        1.3         \\ \bottomrule
+		\textbf{City Centre}   &      0       &       2.7       &         88.5         & 7.7                    &        1.3         \\
 		\textbf{Metro Station} &     3.8      &       5.1       &         34.1         & 50.0                   &        6.4 \\ \bottomrule
 	\end{tabularx}
 \end{table}
